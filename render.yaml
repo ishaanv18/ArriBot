@@ -1,5 +1,5 @@
+# Deploy Backend Only with render.yaml
 services:
-  # Backend Service
   - type: web
     name: arribot-backend
     runtime: java
@@ -19,14 +19,3 @@ services:
         sync: false
       - key: CORS_ORIGINS
         sync: false
-
-  # Frontend Static Site
-  - type: static
-    name: arribot-frontend
-    runtime: static
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://arribot-backend.onrender.com
