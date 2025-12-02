@@ -1,0 +1,21 @@
+# Deploy Backend Only with render.yaml
+services:
+  - type: web
+    name: arribot-backend
+    runtime: java
+    rootDir: backend
+    buildCommand: mvn clean package -DskipTests
+    startCommand: java -jar target/arribot-backend-1.0.0.jar
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: GMAIL_USERNAME
+        sync: false
+      - key: GMAIL_PASSWORD
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
