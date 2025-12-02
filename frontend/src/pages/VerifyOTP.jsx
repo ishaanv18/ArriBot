@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authAPI } from '../utils/api';
+import toast from 'react-hot-toast';
 import logo from '../assets/arribot-logo-new.png';
 
 const VerifyOTP = () => {
@@ -74,6 +75,10 @@ const VerifyOTP = () => {
             await authAPI.resendOTP(email);
             setOtp(['', '', '', '']);
             document.getElementById('otp-0')?.focus();
+            toast.success('New OTP sent! Check your email.', {
+                duration: 4000,
+                icon: '📧',
+            });
         } catch (err) {
             setError('Failed to resend OTP. Please try again.');
         } finally {
@@ -170,6 +175,37 @@ const VerifyOTP = () => {
                             )}
                         </button>
                     </form>
+
+                    {/* Email Warnings */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="mt-6 bg-purple-50 border border-purple-200 rounded-lg p-4"
+                    >
+                        <div className="flex items-start space-x-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                            </svg>
+                            <div className="flex-1">
+                                <p className="text-sm font-semibold text-purple-900 mb-2">Can't find the email?</p>
+                                <ul className="text-sm text-purple-700 space-y-1">
+                                    <li className="flex items-start">
+                                        <span className="mr-2">•</span>
+                                        <span>Check your <strong>spam/junk folder</strong></span>
+                                    </li>
+                                    <li className="flex items-start">
+                                        <span className="mr-2">•</span>
+                                        <span>Email may take <strong>1-2 minutes</strong> to arrive</span>
+                                    </li>
+                                    <li className="flex items-start">
+                                        <span className="mr-2">•</span>
+                                        <span>Make sure you entered the correct email</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </motion.div>
 
                     <div className="mt-6 text-center">
                         <p className="text-gray-600 mb-2">Didn't receive the code?</p>

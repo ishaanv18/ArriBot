@@ -124,7 +124,7 @@ public class AuthController {
 
             // Try to send email (non-blocking)
             try {
-                emailService.sendContactFormNotification(
+                emailService.sendContactFormEmail(
                         contactForm.getName(),
                         contactForm.getEmail(),
                         contactForm.getMessage());
