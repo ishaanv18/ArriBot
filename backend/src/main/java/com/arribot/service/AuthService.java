@@ -52,10 +52,13 @@ public class AuthService {
 
         // Send OTP email (non-blocking - don't fail signup if email fails)
         try {
+            System.out.println("Attempting to send email via SendGrid...");
             emailService.sendOTP(email, otp);
+            System.out.println("✅ Email sent successfully!");
             return "OTP sent to " + email;
         } catch (Exception e) {
-            System.err.println("Failed to send OTP email: " + e.getMessage());
+            System.err.println("❌ Failed to send OTP email: " + e.getMessage());
+            e.printStackTrace(); // Print full stack trace
             return "Account created. Check console for OTP (Email service unavailable)";
         }
     }
