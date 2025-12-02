@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { authAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import logo from '../assets/arribot-logo.png';
+import logo from '../assets/arribot-logo-new.png';
 
 const SignIn = () => {
     const navigate = useNavigate();

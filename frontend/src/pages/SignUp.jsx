@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../utils/api';
 import toast from 'react-hot-toast';
-import logo from '../assets/arribot-logo.png';
+import logo from '../assets/arribot-logo-new.png';
 
 const PasswordAnalyzer = ({ password }) => {
     const getStrength = () => {

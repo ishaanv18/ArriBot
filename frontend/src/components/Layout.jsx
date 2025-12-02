@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import logo from '../assets/arribot-logo.png';
+import logo from '../assets/arribot-logo-new.png';
 
 const Layout = ({ children }) => {
     const location = useLocation();

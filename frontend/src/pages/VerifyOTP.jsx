@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authAPI } from '../utils/api';
-import logo from '../assets/arribot-logo.png';
+import logo from '../assets/arribot-logo-new.png';
 
 const VerifyOTP = () => {
     const navigate = useNavigate();
