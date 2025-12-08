@@ -40,7 +40,7 @@ const Layout = ({ children }) => {
     }
 
     return (
-        <div className="min-h-screen animated-bg">
+        <div className="min-h-screen">
             {/* Header */}
             <header className="glass sticky top-0 z-50">
                 <div className="container mx-auto px-6 py-4">
