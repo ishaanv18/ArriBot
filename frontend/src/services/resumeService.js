@@ -4,10 +4,10 @@ const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:10000') + '/a
 
 // Helper to get token
 const getAuthHeaders = () => {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const token = localStorage.getItem('token');
     return {
         headers: {
-            'Authorization': `Bearer ${user?.token}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json' // Default, will override for upload
         }
     };
@@ -19,10 +19,10 @@ const resumeService = {
         const formData = new FormData();
         formData.append('file', file);
 
-        const user = JSON.parse(localStorage.getItem('user'));
+        const token = localStorage.getItem('token');
         const response = await axios.post(`${API_URL}/upload`, formData, {
             headers: {
-                'Authorization': `Bearer ${user?.token}`,
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'multipart/form-data'
             }
         });
