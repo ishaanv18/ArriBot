@@ -1,9 +1,11 @@
-package com.arribot.controller;
+import com.arribot.controller;
 
 import com.arribot.model.Resume;
+import com.arribot.model.SkillAnalysis;
 import com.arribot.model.User;
 import com.arribot.repository.UserRepository;
 import com.arribot.service.ResumeService;
+import com.arribot.service.SkillAnalysisService;
 import com.arribot.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,9 @@ public class ResumeController {
 
     @Autowired
     private ResumeService resumeService;
+
+    @Autowired
+    private SkillAnalysisService skillAnalysisService;
 
     @Autowired
     private UserRepository userRepository;
@@ -172,6 +177,104 @@ public class ResumeController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", "Failed to delete resume: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * Analyze a resume with AI
+     */
+    @PostMapping("/{id}/analyze")
+    public ResponseEntity<?> analyzeResume(
+            @PathVariable String id,
+            @RequestParam(required = false) String targetRole,
+            @RequestHeader("Authorization") String authHeader) {
+        
+        try {
+            // Extract user from JWT
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtUtil.extractEmail(token);
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Get resume
+            Optional<Resume> resumeOpt = resumeService.getResumeById(id, user);
+            if (resumeOpt.isEmpty()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "Resume not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+
+            Resume resume = resumeOpt.get();
+
+            // Analyze resume
+            SkillAnalysis analysis = skillAnalysisService.analyzeResume(
+                    resume, 
+                    targetRole != null ? targetRole : "Software Developer"
+            );
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("analysis", analysis);
+            response.put("message", "Resume analyzed successfully");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Failed to analyze resume: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * Get analysis results for a resume
+     */
+    @GetMapping("/{id}/analysis")
+    public ResponseEntity<?> getAnalysis(
+            @PathVariable String id,
+            @RequestHeader("Authorization") String authHeader) {
+        
+        try {
+            // Extract user from JWT
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtUtil.extractEmail(token);
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Get resume
+            Optional<Resume> resumeOpt = resumeService.getResumeById(id, user);
+            if (resumeOpt.isEmpty()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "Resume not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+
+            Resume resume = resumeOpt.get();
+
+            // Get latest analysis
+            Optional<SkillAnalysis> analysisOpt = skillAnalysisService.getLatestAnalysis(resume);
+            
+            if (analysisOpt.isEmpty()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "No analysis found. Please analyze the resume first.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("analysis", analysisOpt.get());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Failed to fetch analysis: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
