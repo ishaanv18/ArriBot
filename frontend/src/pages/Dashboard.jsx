@@ -84,12 +84,46 @@ export default function Dashboard() {
         return () => clearInterval(timer);
     }, [user]);
 
-    // ... existing handleLogout and render ...
+    const handleLogout = () => {
+        logout();
+        toast.success("Logout Successfully", { icon: '👋' });
+        navigate('/auth');
+    };
 
     return (
         <div className="min-h-screen bg-void-base text-white p-6 pb-24 md:p-12">
 
-            {/* ... Header ... */}
+            {/* Header / Command Bar */}
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+                <div>
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                        <span className="text-xs font-mono text-cyan-400 tracking-widest">COMMAND_CENTER // ONLINE</span>
+                    </div>
+                    <div className="flex items-baseline gap-3">
+                        <h1 className="text-4xl md:text-5xl font-display font-bold">
+                            WELCOME BACK,
+                        </h1>
+                        <span className="text-4xl md:text-5xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-white/80 to-white/40">
+                            <ScrambleText text={user?.fullName?.split(' ')[0]?.toUpperCase() || 'TRAVELER'} />
+                        </span>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-6">
+                    <div className="text-right hidden md:block">
+                        <p className="text-2xl font-mono">{time.toLocaleTimeString([], { hour12: false })}</p>
+                        <p className="text-xs text-white/40 font-mono uppercase">{time.toLocaleDateString()}</p>
+                    </div>
+                    <button
+                        onClick={handleLogout}
+                        className="bg-white/5 border border-white/10 text-white/60 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30 px-4 py-2 rounded-xl transition-all font-mono text-xs uppercase tracking-widest flex items-center gap-2"
+                    >
+                        <div className="w-2 h-2 rounded-full bg-current" />
+                        Power Off
+                    </button>
+                </div>
+            </header>
 
             {/* Main Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
