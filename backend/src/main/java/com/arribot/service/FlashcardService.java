@@ -49,7 +49,11 @@ public class FlashcardService {
             String jsonString = extractJson(response);
             JsonArray jsonArray = gson.fromJson(jsonString, JsonArray.class);
 
-            for (int i = 0; i < jsonArray.size(); i++) {
+            // Limit to exact count requested
+            int itemsToProcess = Math.min(jsonArray.size(), count);
+            logger.info("Processing {} flashcards (requested: {}, received: {})", itemsToProcess, count, jsonArray.size());
+
+            for (int i = 0; i < itemsToProcess; i++) {
                 JsonObject obj = jsonArray.get(i).getAsJsonObject();
                 String question = obj.get("question").getAsString();
                 String answer = obj.get("answer").getAsString();

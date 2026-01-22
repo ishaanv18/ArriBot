@@ -52,7 +52,7 @@ public class GroqService {
         messages.add(message);
         
         requestBody.add("messages", messages);
-        requestBody.addProperty("temperature", 0.7);
+        requestBody.addProperty("temperature", 0.3);
         requestBody.addProperty("max_tokens", 2000);
 
         RequestBody body = RequestBody.create(
@@ -101,11 +101,13 @@ public class GroqService {
      */
     public String generateFlashcards(String topic, int count) throws IOException {
         String prompt = String.format(
-                "Generate exactly %d flashcards about '%s'. " +
-                "Format your response as a JSON array with objects containing 'question' and 'answer' fields. " +
-                "Make the questions clear and the answers concise but informative. " +
-                "Example format: [{\"question\": \"What is...\", \"answer\": \"It is...\"}]",
-                count, topic);
+                "Generate EXACTLY %d flashcards about '%s'. " +
+                "CRITICAL: Return ONLY a valid JSON array, no additional text before or after. " +
+                "Each object must have 'question' and 'answer' fields. " +
+                "Make questions clear and answers concise. " +
+                "Output format: [{\"question\": \"What is...\", \"answer\": \"It is...\"}]. " +
+                "Generate EXACTLY %d items, no more, no less.",
+                count, topic, count);
         return generateContent(prompt);
     }
 
