@@ -2,7 +2,7 @@ package com.arribot.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DBRef;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 
@@ -12,15 +12,14 @@ public class Resume {
     @Id
     private String id;
 
-    @DBRef
-    @com.fasterxml.jackson.annotation.JsonManagedReference
-    private User user;
-
+    // Store userId as string instead of DBRef to avoid serialization issues
+    private String userId;
+    
     private String fileName;
     private String filePath;
     private LocalDateTime uploadedAt;
 
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @JsonIgnore
     private String extractedText;
 
     private String analysisResult;
@@ -30,8 +29,8 @@ public class Resume {
         this.uploadedAt = LocalDateTime.now();
     }
 
-    public Resume(User user, String fileName, String filePath) {
-        this.user = user;
+    public Resume(String userId, String fileName, String filePath) {
+        this.userId = userId;
         this.fileName = fileName;
         this.filePath = filePath;
         this.uploadedAt = LocalDateTime.now();
@@ -46,12 +45,12 @@ public class Resume {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getFileName() {

@@ -1,7 +1,6 @@
 package com.arribot.repository;
 
 import com.arribot.model.Resume;
-import com.arribot.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,9 +10,9 @@ import java.util.Optional;
 @Repository
 public interface ResumeRepository extends MongoRepository<Resume, String> {
     
-    List<Resume> findByUserOrderByUploadedAtDesc(User user);
+    List<Resume> findByUserIdOrderByUploadedAtDesc(String userId);
     
-    Optional<Resume> findByIdAndUser(String id, User user);
+    Optional<Resume> findByIdAndUserId(String id, String userId);
     
-    long countByUser(User user);
+    long countByUserId(String userId);
 }

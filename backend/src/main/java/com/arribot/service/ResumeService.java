@@ -59,7 +59,7 @@ public class ResumeService {
         String extractedText = pdfProcessorService.extractTextFromPDF(file);
 
         // Create and save resume entity
-        Resume resume = new Resume(user, originalFilename, filePath);
+        Resume resume = new Resume(user.getId(), originalFilename, filePath);
         resume.setExtractedText(extractedText);
 
         return resumeRepository.save(resume);
@@ -69,21 +69,21 @@ public class ResumeService {
      * Get all resumes for a user
      */
     public List<Resume> getUserResumes(User user) {
-        return resumeRepository.findByUserOrderByUploadedAtDesc(user);
+        return resumeRepository.findByUserIdOrderByUploadedAtDesc(user.getId());
     }
 
     /**
      * Get a specific resume by ID (user-specific)
      */
     public Optional<Resume> getResumeById(String id, User user) {
-        return resumeRepository.findByIdAndUser(id, user);
+        return resumeRepository.findByIdAndUserId(id, user.getId());
     }
 
     /**
      * Delete a resume
      */
     public boolean deleteResume(String id, User user) {
-        Optional<Resume> resumeOpt = resumeRepository.findByIdAndUser(id, user);
+        Optional<Resume> resumeOpt = resumeRepository.findByIdAndUserId(id, user.getId());
         
         if (resumeOpt.isEmpty()) {
             return false;
@@ -108,6 +108,6 @@ public class ResumeService {
      * Get resume count for a user
      */
     public long getResumeCount(User user) {
-        return resumeRepository.countByUser(user);
+        return resumeRepository.countByUserId(user.getId());
     }
 }
