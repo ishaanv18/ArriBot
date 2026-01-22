@@ -29,27 +29,40 @@ export default function Auth() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Basic Client-Side Validation
+        if (!formData.email || !formData.password) {
+            toast.error("Credentials Required", { icon: '🚫' });
+            return;
+        }
+
+        if (isSignUp && (!formData.fullName || !formData.confirmPassword)) {
+            toast.error("Incomplete Protocol", { icon: '🚫' });
+            return;
+        }
+
         setIsLoading(true);
 
         try {
             if (isSignUp) {
                 if (formData.password !== formData.confirmPassword) {
-                    toast.error("Code Mismatch", { icon: '🚫' });
-                    return;
+                    throw new Error("Code Mismatch");
                 }
                 await signup(formData);
                 toast.success("Identity Created. Proceed", { icon: '🆔' });
+                // Only navigate after successful await
                 navigate('/verify-otp', { state: { email: formData.email } });
             } else {
                 await login({ email: formData.email, password: formData.password });
                 toast.success("Access Granted", { icon: '🔓' });
+                // Only navigate after successful await
                 navigate('/dashboard');
             }
         } catch (error) {
             console.error(error);
-            toast.error("Access Denied", { icon: '🛑' });
-        } finally {
-            setIsLoading(false);
+            const msg = error.response?.data?.message || error.message || "Access Denied";
+            toast.error(msg, { icon: '🛑' });
+            setIsLoading(false); // Only stop loading on error to keep UI stable during nav
         }
     };
 

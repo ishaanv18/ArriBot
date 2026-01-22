@@ -45,7 +45,7 @@ const StatCard = ({ label, value, trend }) => (
 );
 
 export default function Dashboard() {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [time, setTime] = useState(new Date());
 
@@ -53,6 +53,11 @@ export default function Dashboard() {
         const timer = setInterval(() => setTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
+
+    const handleLogout = () => {
+        logout();
+        navigate('/auth');
+    };
 
     return (
         <div className="min-h-screen bg-void-base text-white p-6 pb-24 md:p-12">
@@ -74,6 +79,13 @@ export default function Dashboard() {
                         <p className="text-2xl font-mono">{time.toLocaleTimeString([], { hour12: false })}</p>
                         <p className="text-xs text-white/40 font-mono uppercase">{time.toLocaleDateString()}</p>
                     </div>
+                    <button
+                        onClick={handleLogout}
+                        className="bg-white/5 border border-white/10 text-white/60 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30 px-4 py-2 rounded-xl transition-all font-mono text-xs uppercase tracking-widest flex items-center gap-2"
+                    >
+                        <div className="w-2 h-2 rounded-full bg-current" />
+                        Power Off
+                    </button>
                 </div>
             </header>
 
