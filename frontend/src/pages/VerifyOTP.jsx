@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { authAPI } from '../utils/api';
 import { ShieldCheck, Loader2, Fingerprint, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ScrambleText } from '../components/ui/ScrambleText';
@@ -10,6 +11,7 @@ import { ScrambleText } from '../components/ui/ScrambleText';
 export default function VerifyOTP() {
     const [otp, setOtp] = useState(['', '', '', '']);
     const [isLoading, setIsLoading] = useState(false);
+    const [timer, setTimer] = useState(45); // 45s cooldown
     const inputRefs = useRef([]);
     const location = useLocation();
     const navigate = useNavigate();
@@ -23,6 +25,30 @@ export default function VerifyOTP() {
             navigate('/auth');
         }
     }, [email, navigate]);
+
+    // Timer Countdown
+    useEffect(() => {
+        let interval;
+        if (timer > 0) {
+            interval = setInterval(() => {
+                setTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [timer]);
+
+    const handleResend = async () => {
+        if (timer > 0) return;
+
+        const toastId = toast.loading("Requesting new key...");
+        try {
+            await authAPI.resendOTP(email);
+            toast.success("New Key Transmitted", { id: toastId, icon: '📩' });
+            setTimer(45); // Reset timer
+        } catch (error) {
+            toast.error("Transmission Failed", { id: toastId });
+        }
+    };
 
     const handleChange = (index, value) => {
         if (value.length > 1) return;
@@ -110,8 +136,11 @@ export default function VerifyOTP() {
                         <h2 className="text-2xl font-display font-bold text-white mb-2">
                             <ScrambleText text="SECURITY PROTOCOL" />
                         </h2>
-                        <p className="text-white/40 text-xs font-mono">
+                        <p className="text-white/40 text-xs font-mono mb-2">
                             Enter the 4-digit key sent to <span className="text-white/70">{email.replace(/(.{2})(.*)(@.*)/, "$1***$3")}</span>
+                        </p>
+                        <p className="text-cyan-400/60 text-[10px] font-mono uppercase tracking-wider">
+                            ⚡ Key Valid for 10 Minutes
                         </p>
                     </div>
 
@@ -153,6 +182,18 @@ export default function VerifyOTP() {
                                 {!isLoading && <Fingerprint size={20} className="group-hover:scale-110 transition-transform" />}
                             </span>
                         </button>
+
+                        <div className="text-center">
+                            <button
+                                type="button"
+                                onClick={handleResend}
+                                disabled={timer > 0}
+                                className={`text-xs font-mono tracking-widest transition-colors ${timer > 0 ? "text-white/20 cursor-not-allowed" : "text-cyan-400 hover:text-cyan-300 underline decoration-cyan-400/30"
+                                    }`}
+                            >
+                                {timer > 0 ? `RESEND KEY IN 00:${timer.toString().padStart(2, '0')}` : "RESEND SECURE KEY"}
+                            </button>
+                        </div>
                     </form>
 
                     <div className="mt-8 text-center">

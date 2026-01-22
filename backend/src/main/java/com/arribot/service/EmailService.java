@@ -1,3 +1,4 @@
+
 package com.arribot.service;
 
 import com.sendgrid.*;
@@ -27,52 +28,54 @@ public class EmailService {
         String subject = "ArriBot - Your OTP Verification Code";
 
         // Build HTML content with OTP inserted directly
-        String htmlContent = "<!DOCTYPE html>" +
-                "<html>" +
-                "<head>" +
-                "<style>" +
-                "body { font-family: 'Inter', Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; }" +
-                ".container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden; }"
-                +
-                ".header { background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%); padding: 40px 20px; text-align: center; }"
-                +
-                ".header h1 { color: #ffffff; margin: 0; font-size: 32px; }" +
-                ".content { padding: 40px 30px; }" +
-                ".otp-box { background-color: #f9fafb; border: 2px dashed #9333ea; border-radius: 12px; padding: 30px; text-align: center; margin: 30px 0; }"
-                +
-                ".otp-code { font-size: 48px; font-weight: bold; color: #9333ea; letter-spacing: 8px; }" +
-                ".footer { background-color: #f9fafb; padding: 20px; text-align: center; color: #6b7280; font-size: 14px; }"
-                +
-                "</style>" +
-                "</head>" +
-                "<body>" +
-                "<div class=\"container\">" +
-                "<div class=\"header\">" +
-                "<h1>🤖 ArriBot</h1>" +
-                "</div>" +
-                "<div class=\"content\">" +
-                "<h2 style=\"color: #1f2937; margin-top: 0;\">Verify Your Email</h2>" +
-                "<p style=\"color: #4b5563; font-size: 16px; line-height: 1.6;\">" +
-                "Thank you for signing up with ArriBot! To complete your registration, please use the following One-Time Password (OTP):"
-                +
-                "</p>" +
-                "<div class=\"otp-box\">" +
-                "<div class=\"otp-code\">" + otp + "</div>" +
-                "</div>" +
-                "<p style=\"color: #4b5563; font-size: 14px; line-height: 1.6;\">" +
-                "This OTP is valid for <strong>10 minutes</strong>. Please do not share this code with anyone." +
-                "</p>" +
-                "<p style=\"color: #4b5563; font-size: 14px; line-height: 1.6;\">" +
-                "If you didn't request this code, please ignore this email." +
-                "</p>" +
-                "</div>" +
-                "<div class=\"footer\">" +
-                "<p style=\"margin: 0;\">© 2025 ArriBot. All rights reserved.</p>" +
-                "<p style=\"margin: 10px 0 0 0;\">Your AI-powered learning companion</p>" +
-                "</div>" +
-                "</div>" +
-                "</body>" +
-                "</html>";
+        String htmlContent = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body { font-family: 'Courier New', monospace; background-color: #030014; margin: 0; padding: 0; color: #e2e8f0; }
+                    .container { max-width: 600px; margin: 40px auto; background-color: #0F0529; border: 1px solid #22d3ee33; border-radius: 16px; overflow: hidden; box-shadow: 0 0 20px rgba(34, 211, 238, 0.1); }
+                    .header { background: linear-gradient(90deg, #2e1065 0%, #0c4a6e 100%); padding: 30px; text-align: center; border-bottom: 1px solid #22d3ee33; }
+                    .header h1 { color: #22d3ee; margin: 0; font-size: 28px; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 10px rgba(34, 211, 238, 0.5); }
+                    .content { padding: 40px 30px; text-align: center; }
+                    .otp-box { background: rgba(34, 211, 238, 0.05); border: 1px dashed #22d3ee; border-radius: 8px; padding: 20px; margin: 30px 0; display: inline-block; min-width: 200px; }
+                    .otp-code { font-size: 42px; font-weight: bold; color: #fff; letter-spacing: 8px; font-family: 'Courier New', monospace; text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+                    .notice { color: #94a3b8; font-size: 14px; margin-top: 20px; line-height: 1.6; }
+                    .footer { background-color: #080216; padding: 20px; text-align: center; color: #475569; font-size: 12px; border-top: 1px solid #ffffff11; }
+                    .accent { color: #c084fc; font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>ARR_IBOT // PROTOCOL</h1>
+                    </div>
+                    <div class="content">
+                        <h2 style="color: #fff; margin-top: 0; font-weight: normal; font-size: 20px;">Identity Verification Required</h2>
+                        <p style="color: #cbd5e1; font-size: 16px;">
+                            Access request detected. Authenticate to proceed to the <span class="accent">Spatial Workspace</span>.
+                        </p>
+                        
+                        <div class="otp-box">
+                            <div class="otp-code">""" + otp + """
+                            </div>
+                        </div>
+
+                        <p class="notice">
+                            This key will self-destruct in <strong>10 minutes</strong>.<br>
+                            If you did not initiate this sequence, ignore this transmission.
+                        </p>
+                    </div>
+                    <div class="footer">
+                        <p>SECURE CHANNEL ENCRYPTED</p>
+                        <p>&copy; 2025 ArriBot Systems. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """;
 
         Content content = new Content("text/html", htmlContent);
         Mail mail = new Mail(from, subject, to, content);
