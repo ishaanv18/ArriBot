@@ -121,10 +121,7 @@ const Flashcards = () => {
                     <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {flashcards.map((card, index) => (
                             <div key={index} className="h-[300px]" style={{ perspective: '1000px' }}>
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: index * 0.1 }}
+                                <div
                                     className="relative w-full h-full cursor-pointer"
                                     style={{
                                         transformStyle: 'preserve-3d',
@@ -134,7 +131,7 @@ const Flashcards = () => {
                                     onClick={() => toggleFlip(index)}
                                 >
                                     {/* Front */}
-                                    <TiltCard
+                                    <div
                                         className="absolute inset-0 w-full h-full bg-glass-base backdrop-blur-xl border border-white/10 rounded-3xl p-8 flex flex-col justify-between group hover:border-violet-500/30"
                                         style={{ backfaceVisibility: 'hidden' }}
                                     >
@@ -152,10 +149,10 @@ const Flashcards = () => {
                                         <p className="text-xs font-mono text-white/30 flex items-center gap-2 group-hover:text-white/60 transition-colors">
                                             Click to Reveal <ArrowRight size={10} />
                                         </p>
-                                    </TiltCard>
+                                    </div>
 
                                     {/* Back */}
-                                    <TiltCard
+                                    <div
                                         className="absolute inset-0 w-full h-full bg-violet-950/40 backdrop-blur-xl border border-violet-500/30 rounded-3xl p-8 flex flex-col justify-between"
                                         style={{
                                             backfaceVisibility: 'hidden',
@@ -176,8 +173,8 @@ const Flashcards = () => {
                                         <p className="text-xs font-mono text-white/30 flex items-center gap-2">
                                             <ArrowLeft size={10} /> Return to Query
                                         </p>
-                                    </TiltCard>
-                                </motion.div>
+                                    </div>
+                                </div>
                             </div>
                         ))}
                     </div>
