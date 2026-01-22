@@ -78,6 +78,24 @@ export default function Auth() {
         } catch (error) {
             console.error(error);
             const msg = error.response?.data?.message || "Access Denied";
+
+            // Handle Unverified User Case
+            if (msg.includes("Please verify your email first") || msg.toLowerCase().includes("verify")) {
+                toast.error("Account not verified. Sending OTP...", { icon: '⚠️' });
+                try {
+                    await authAPI.resendOTP(formData.email);
+                    toast.success("OTP Sent. Please check your email.", { icon: '📩' });
+                    navigate('/verify-otp', { state: { email: formData.email } });
+                } catch (resendError) {
+                    console.error("Resend failed", resendError);
+                    toast.error("Failed to send OTP. Please try refreshing.", { icon: '❌' });
+                    // Still navigate so they can try resend button there
+                    navigate('/verify-otp', { state: { email: formData.email } });
+                }
+                setIsLoading(false);
+                return;
+            }
+
             toast.error(msg, { icon: '🛑' });
             setIsLoading(false);
         }
