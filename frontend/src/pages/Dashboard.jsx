@@ -71,9 +71,14 @@ export default function Dashboard() {
                         <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
                         <span className="text-xs font-mono text-cyan-400 tracking-widest">COMMAND_CENTER // ONLINE</span>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-display font-bold">
-                        WELCOME BACK, <span className="text-white/60">{user?.fullName?.split(' ')[0] || 'USER'}</span>
-                    </h1>
+                    <div className="flex items-baseline gap-3">
+                        <h1 className="text-4xl md:text-5xl font-display font-bold">
+                            WELCOME BACK,
+                        </h1>
+                        <span className="text-4xl md:text-5xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-white/80 to-white/40">
+                            <ScrambleText text={user?.fullName?.split(' ')[0]?.toUpperCase() || 'TRAVELER'} />
+                        </span>
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-6">
@@ -98,10 +103,10 @@ export default function Dashboard() {
                 <div className="lg:col-span-2 space-y-6">
                     {/* Stats Row */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <StatCard label="Daily Streak" value="12 Days" trend="🔥" />
-                        <StatCard label="Knowledge Pts" value="8,450" trend="+120" />
-                        <StatCard label="Cards Mastered" value="1,240" />
-                        <StatCard label="System Level" value="v.4.2" />
+                        <StatCard label="Daily Streak" value="1 Days" trend="🔥" />
+                        <StatCard label="Knowledge Pts" value="150" trend="+10" />
+                        <StatCard label="Cards Mastered" value="0" />
+                        <StatCard label="System Level" value="v.1.0" />
                     </div>
 
                     {/* Modules Grid */}
@@ -148,11 +153,9 @@ export default function Dashboard() {
 
                         <div className="space-y-6 relative z-10">
                             {[
-                                { action: 'Completed Quiz: Algebra', time: '2m ago', icon: BrainCircuit },
-                                { action: 'Generated Flashcards', time: '14m ago', icon: Zap },
-                                { action: 'Chat Session: Physics', time: '1h ago', icon: MessageSquare },
-                                { action: 'System Update', time: '4h ago', icon: Shield },
-                                { action: 'Study Streak', time: '1d ago', icon: Clock },
+                                { action: 'System Login', time: 'Just now', icon: Shield },
+                                { action: 'Neural Link Established', time: '1m ago', icon: Zap },
+                                { action: 'Workspace Loaded', time: '2m ago', icon: Clock },
                             ].map((item, i) => (
                                 <div key={i} className="flex gap-4 items-start group">
                                     <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/40 group-hover:text-cyan-400 group-hover:bg-cyan-500/10 transition-colors">
