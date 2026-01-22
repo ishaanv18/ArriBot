@@ -4,7 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { FloatingDock } from './ui/FloatingDock';
 import { SpotlightCursor } from './ui/SpotlightCursor';
-import { Home, LayoutDashboard, MessageSquare, BookOpen, BrainCircuit, FileText, Mail, LogIn, User } from 'lucide-react';
+import { Home, LayoutDashboard, MessageSquare, BookOpen, BrainCircuit, FileText, Mail, LogIn, User, Briefcase } from 'lucide-react';
 
 const Layout = ({ children }) => {
     const location = useLocation();
@@ -19,6 +19,8 @@ const Layout = ({ children }) => {
             { path: '/flashcards', label: 'Flashcards', icon: BookOpen },
             { path: '/quiz', label: 'Quiz', icon: BrainCircuit },
             { path: '/summarize', label: 'Summarizer', icon: FileText },
+            { path: '/resume', label: 'Resume', icon: Briefcase },
+        ] : [
         ] : [
             { path: '/auth', label: 'Sign In', icon: LogIn },
         ]),
