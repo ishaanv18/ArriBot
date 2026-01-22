@@ -185,31 +185,55 @@ public class EmailService {
         Email to = new Email(fromEmail);
         String subject = "New Contact Form Submission - ArriBot";
 
-        String htmlContent = "<!DOCTYPE html><html><head><style>" +
-                "body { font-family: 'Inter', Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; }" +
-                ".container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden; }"
-                +
-                ".header { background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%); padding: 40px 20px; text-align: center; }"
-                +
-                ".header h1 { color: #ffffff; margin: 0; font-size: 28px; }" +
-                ".content { padding: 40px 30px; }" +
-                ".info-box { background-color: #f9fafb; border-radius: 8px; padding: 20px; margin: 20px 0; }" +
-                ".footer { background-color: #f9fafb; padding: 20px; text-align: center; color: #6b7280; font-size: 14px; }"
-                +
-                "</style></head><body>" +
-                "<div class=\"container\"><div class=\"header\"><h1>📬 New Contact Form</h1></div>" +
-                "<div class=\"content\">" +
-                "<div class=\"info-box\"><p style=\"margin: 0; color: #6b7280; font-size: 14px;\">Name</p>" +
-                "<p style=\"margin: 5px 0 0 0; color: #1f2937; font-size: 16px; font-weight: bold;\">" + name
-                + "</p></div>" +
-                "<div class=\"info-box\"><p style=\"margin: 0; color: #6b7280; font-size: 14px;\">Email</p>" +
-                "<p style=\"margin: 5px 0 0 0; color: #1f2937; font-size: 16px; font-weight: bold;\">" + email
-                + "</p></div>" +
-                "<div class=\"info-box\"><p style=\"margin: 0; color: #6b7280; font-size: 14px;\">Message</p>" +
-                "<p style=\"margin: 10px 0 0 0; color: #1f2937; font-size: 16px; line-height: 1.6;\">" + message
-                + "</p></div>" +
-                "</div><div class=\"footer\"><p style=\"margin: 0;\">© 2025 ArriBot</p></div></div>" +
-                "</body></html>";
+        String htmlContent = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body { font-family: 'Courier New', monospace; background-color: #030014; margin: 0; padding: 0; color: #e2e8f0; }
+                    .container { max-width: 600px; margin: 40px auto; background-color: #0F0529; border: 1px solid #22d3ee33; border-radius: 16px; overflow: hidden; box-shadow: 0 0 20px rgba(34, 211, 238, 0.1); }
+                    .header { background: linear-gradient(90deg, #2e1065 0%, #0c4a6e 100%); padding: 30px; text-align: center; border-bottom: 1px solid #22d3ee33; }
+                    .header h1 { color: #22d3ee; margin: 0; font-size: 24px; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 10px rgba(34, 211, 238, 0.5); }
+                    .content { padding: 40px 30px; }
+                    .info-box { background: rgba(34, 211, 238, 0.05); border-left: 3px solid #c084fc; padding: 15px; margin: 15px 0; }
+                    .label { color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+                    .value { color: #fff; font-size: 16px; font-weight: bold; }
+                    .message-box { background: rgba(255, 255, 255, 0.03); border: 1px dashed #ffffff33; border-radius: 8px; padding: 20px; margin-top: 20px; color: #cbd5e1; line-height: 1.6; }
+                    .footer { background-color: #080216; padding: 20px; text-align: center; color: #475569; font-size: 12px; border-top: 1px solid #ffffff11; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>INCOMING TRANSMISSION</h1>
+                    </div>
+                    <div class="content">
+                        <div class="info-box">
+                            <div class="label">Source ID (Name)</div>
+                            <div class="value">""" + name + """
+                            </div>
+                        </div>
+                        <div class="info-box">
+                            <div class="label">Comm Link (Email)</div>
+                            <div class="value">""" + email + """
+                            </div>
+                        </div>
+                        
+                        <div class="label" style="margin-top: 25px;">Decoded Message Payload:</div>
+                        <div class="message-box">
+                            """ + message + """
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <p>SECURE CHANNEL ENCRYPTED</p>
+                        <p>&copy; 2025 ArriBot Systems. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """;
 
         Content content = new Content("text/html", htmlContent);
         Mail mail = new Mail(from, subject, to, content);
