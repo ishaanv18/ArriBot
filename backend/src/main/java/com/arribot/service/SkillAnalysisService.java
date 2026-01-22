@@ -49,6 +49,12 @@ public class SkillAnalysisService {
         analysis.setRecommendedSkills(aiResult.getRecommendedSkills());
         analysis.setExperienceYears(aiResult.getExperienceYears());
         analysis.setLearningPath(aiResult.getLearningPath());
+        
+        // Set quality scores
+        analysis.setOverallScore(aiResult.getOverallScore());
+        analysis.setSkillMatchScore(aiResult.getSkillMatchScore());
+        analysis.setExperienceScore(aiResult.getExperienceScore());
+        analysis.setResumeQualityScore(aiResult.getResumeQualityScore());
 
         return skillAnalysisRepository.save(analysis);
     }

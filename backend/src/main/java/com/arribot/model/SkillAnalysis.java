@@ -24,6 +24,12 @@ public class SkillAnalysis {
     private Integer experienceYears;
     private String learningPath; // JSON string
     private LocalDateTime analyzedAt;
+    
+    // Quality Metrics (0-100)
+    private Integer overallScore = 0;
+    private Integer skillMatchScore = 0;
+    private Integer experienceScore = 0;
+    private Integer resumeQualityScore = 0;
 
     // Constructors
     public SkillAnalysis() {
@@ -107,5 +113,37 @@ public class SkillAnalysis {
 
     public void setAnalyzedAt(LocalDateTime analyzedAt) {
         this.analyzedAt = analyzedAt;
+    }
+
+    public Integer getOverallScore() {
+        return overallScore;
+    }
+
+    public void setOverallScore(Integer overallScore) {
+        this.overallScore = overallScore;
+    }
+
+    public Integer getSkillMatchScore() {
+        return skillMatchScore;
+    }
+
+    public void setSkillMatchScore(Integer skillMatchScore) {
+        this.skillMatchScore = skillMatchScore;
+    }
+
+    public Integer getExperienceScore() {
+        return experienceScore;
+    }
+
+    public void setExperienceScore(Integer experienceScore) {
+        this.experienceScore = experienceScore;
+    }
+
+    public Integer getResumeQualityScore() {
+        return resumeQualityScore;
+    }
+
+    public void setResumeQualityScore(Integer resumeQualityScore) {
+        this.resumeQualityScore = resumeQualityScore;
     }
 }

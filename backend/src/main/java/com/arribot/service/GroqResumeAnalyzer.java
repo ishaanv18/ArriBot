@@ -50,7 +50,7 @@ public class GroqResumeAnalyzer {
      */
     private String buildAnalysisPrompt(String resumeText, String targetRole) {
         return String.format("""
-            You are an expert career advisor and resume analyzer. Analyze the following resume and provide a detailed skill assessment.
+            You are an expert career advisor and resume analyzer. Analyze the following resume and provide a detailed skill assessment with quality metrics.
             
             TARGET ROLE: %s
             
@@ -63,6 +63,10 @@ public class GroqResumeAnalyzer {
               "experienceYears": <number>,
               "missingSkills": ["skill1", "skill2", ...],
               "recommendedSkills": ["skill1", "skill2", ...],
+              "overallScore": <0-100>,
+              "skillMatchScore": <0-100>,
+              "experienceScore": <0-100>,
+              "resumeQualityScore": <0-100>,
               "learningPath": [
                 {
                   "skill": "skill name",
@@ -81,6 +85,11 @@ public class GroqResumeAnalyzer {
             4. Recommend skills that would make the candidate more competitive
             5. Create a prioritized learning path with specific, actionable recommendations
             6. For each learning recommendation, explain WHY it's important for the target role
+            7. Calculate quality scores (0-100):
+               - overallScore: Overall resume quality and fit for the target role
+               - skillMatchScore: How well skills match the target role requirements
+               - experienceScore: Quality and relevance of work experience
+               - resumeQualityScore: Resume formatting, clarity, and presentation quality
             
             Return ONLY valid JSON, no additional text.
             """, targetRole != null ? targetRole : "General Software Developer", resumeText);
@@ -189,6 +198,20 @@ public class GroqResumeAnalyzer {
                 result.setLearningPath(json.get("learningPath").toString());
             }
             
+            // Extract quality scores
+            if (json.has("overallScore")) {
+                result.setOverallScore(json.get("overallScore").getAsInt());
+            }
+            if (json.has("skillMatchScore")) {
+                result.setSkillMatchScore(json.get("skillMatchScore").getAsInt());
+            }
+            if (json.has("experienceScore")) {
+                result.setExperienceScore(json.get("experienceScore").getAsInt());
+            }
+            if (json.has("resumeQualityScore")) {
+                result.setResumeQualityScore(json.get("resumeQualityScore").getAsInt());
+            }
+            
             return result;
             
         } catch (Exception e) {
@@ -209,6 +232,10 @@ public class GroqResumeAnalyzer {
         private List<String> missingSkills = new ArrayList<>();
         private List<String> recommendedSkills = new ArrayList<>();
         private String learningPath = "[]";
+        private Integer overallScore = 0;
+        private Integer skillMatchScore = 0;
+        private Integer experienceScore = 0;
+        private Integer resumeQualityScore = 0;
 
         // Getters and Setters
         public List<String> getDetectedSkills() {
@@ -249,6 +276,38 @@ public class GroqResumeAnalyzer {
 
         public void setLearningPath(String learningPath) {
             this.learningPath = learningPath;
+        }
+
+        public Integer getOverallScore() {
+            return overallScore;
+        }
+
+        public void setOverallScore(Integer overallScore) {
+            this.overallScore = overallScore;
+        }
+
+        public Integer getSkillMatchScore() {
+            return skillMatchScore;
+        }
+
+        public void setSkillMatchScore(Integer skillMatchScore) {
+            this.skillMatchScore = skillMatchScore;
+        }
+
+        public Integer getExperienceScore() {
+            return experienceScore;
+        }
+
+        public void setExperienceScore(Integer experienceScore) {
+            this.experienceScore = experienceScore;
+        }
+
+        public Integer getResumeQualityScore() {
+            return resumeQualityScore;
+        }
+
+        public void setResumeQualityScore(Integer resumeQualityScore) {
+            this.resumeQualityScore = resumeQualityScore;
         }
     }
 }
