@@ -65,8 +65,8 @@ export default function Auth() {
 
                 // Let's inspect typical response from backend (Spring Boot usually returns direct object)
                 // We'll trust the response contains 'token' and user details.
-                const { accessToken, tokenType, ...userData } = response.data;
-                const token = accessToken || response.data.token; // Fallback
+                const token = response.data.token || response.data.accessToken;
+                const userData = response.data.user; // Extract actual user object
 
                 if (!token) throw new Error("Security Token Missing");
 
