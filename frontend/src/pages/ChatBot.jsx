@@ -47,7 +47,7 @@ const ChatBot = () => {
     };
 
     return (
-        <div className="min-h-screen bg-void-base text-white p-4 md:p-8 pb-28 flex flex-col items-center">
+        <div className="min-h-screen bg-void-base text-white p-4 md:p-8 pb-40 flex flex-col items-center">
             {/* Header */}
             <div className="w-full max-w-4xl flex items-center justify-between mb-8">
                 <div>
