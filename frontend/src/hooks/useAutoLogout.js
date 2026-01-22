@@ -94,22 +94,12 @@ export const useAutoLogout = (timeout = 5 * 60 * 1000) => {
             window.addEventListener(event, resetTimer, { passive: true });
         });
 
-        // Add tab close detection
-        const handleBeforeUnload = () => {
-            // Clear auth data when tab is closed
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-        };
-
-        window.addEventListener('beforeunload', handleBeforeUnload);
-
         // Cleanup
         return () => {
             cleanup();
             ACTIVITY_EVENTS.forEach(event => {
                 window.removeEventListener(event, resetTimer);
             });
-            window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, [isAuthenticated, timeout]);
 
