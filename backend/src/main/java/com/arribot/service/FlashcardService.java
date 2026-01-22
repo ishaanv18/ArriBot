@@ -18,17 +18,30 @@ public class FlashcardService {
 
     private static final Logger logger = LoggerFactory.getLogger(FlashcardService.class);
     private final GeminiService geminiService;
+    private final GroqService groqService;
     private final FlashcardRepository flashcardRepository;
     private final Gson gson;
 
-    public FlashcardService(GeminiService geminiService, FlashcardRepository flashcardRepository) {
+    public FlashcardService(GeminiService geminiService, GroqService groqService, FlashcardRepository flashcardRepository) {
         this.geminiService = geminiService;
+        this.groqService = groqService;
         this.flashcardRepository = flashcardRepository;
         this.gson = new Gson();
     }
 
     public List<Flashcard> generateFlashcards(String topic, int count) throws IOException {
-        String response = geminiService.generateFlashcards(topic, count);
+        String response;
+        try {
+            // Use Groq as primary
+            response = groqService.generateFlashcards(topic, count);
+            logger.info("Flashcards generated using Groq");
+        } catch (IOException e) {
+            // Fallback to Gemini
+            logger.warn("Groq failed ({}), using Gemini fallback", e.getMessage());
+            response = geminiService.generateFlashcards(topic, count);
+            logger.info("Flashcards generated using Gemini");
+        }
+        
         List<Flashcard> flashcards = new ArrayList<>();
 
         try {
@@ -45,7 +58,7 @@ public class FlashcardService {
                 flashcards.add(flashcardRepository.save(flashcard));
             }
         } catch (Exception e) {
-            logger.error("Error parsing flashcards from Gemini response", e);
+            logger.error("Error parsing flashcards from AI response", e);
             throw new IOException("Failed to parse flashcards: " + e.getMessage());
         }
 

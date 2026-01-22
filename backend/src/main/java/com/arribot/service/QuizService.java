@@ -18,17 +18,30 @@ public class QuizService {
 
     private static final Logger logger = LoggerFactory.getLogger(QuizService.class);
     private final GeminiService geminiService;
+    private final GroqService groqService;
     private final QuizRepository quizRepository;
     private final Gson gson;
 
-    public QuizService(GeminiService geminiService, QuizRepository quizRepository) {
+    public QuizService(GeminiService geminiService, GroqService groqService, QuizRepository quizRepository) {
         this.geminiService = geminiService;
+        this.groqService = groqService;
         this.quizRepository = quizRepository;
         this.gson = new Gson();
     }
 
     public Quiz generateQuiz(String topic, int questionCount) throws IOException {
-        String response = geminiService.generateQuiz(topic, questionCount);
+        String response;
+        try {
+            // Use Groq as primary
+            response = groqService.generateQuiz(topic, questionCount);
+            logger.info("Quiz generated using Groq");
+        } catch (IOException e) {
+            // Fallback to Gemini
+            logger.warn("Groq failed ({}), using Gemini fallback", e.getMessage());
+            response = geminiService.generateQuiz(topic, questionCount);
+            logger.info("Quiz generated using Gemini");
+        }
+        
         List<Quiz.QuizQuestion> questions = new ArrayList<>();
 
         try {
@@ -50,7 +63,7 @@ public class QuizService {
                 questions.add(new Quiz.QuizQuestion(question, options, correctAnswerIndex, explanation));
             }
         } catch (Exception e) {
-            logger.error("Error parsing quiz from Gemini response", e);
+            logger.error("Error parsing quiz from AI response", e);
             throw new IOException("Failed to parse quiz: " + e.getMessage());
         }
 
