@@ -12,9 +12,21 @@ export const AuthProvider = ({ children }) => {
         const storedToken = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
 
-        if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
+        if (storedToken && storedUser && storedUser !== "undefined") {
+            try {
+                const parsedUser = JSON.parse(storedUser);
+                setToken(storedToken);
+                setUser(parsedUser);
+            } catch (error) {
+                console.error("Invalid session data:", error);
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
+        } else {
+            // Clean up if state is inconsistent
+            if (storedUser === "undefined") {
+                localStorage.removeItem('user');
+            }
         }
         setLoading(false);
     }, []);
