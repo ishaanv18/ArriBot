@@ -13,6 +13,7 @@ public class Resume {
     private String id;
 
     @DBRef
+    @com.fasterxml.jackson.annotation.JsonManagedReference
     private User user;
 
     private String fileName;

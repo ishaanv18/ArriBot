@@ -98,9 +98,11 @@ public class ResumeController {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
+            e.printStackTrace(); // Log full stack trace
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", "Failed to fetch resumes: " + e.getMessage());
+            response.put("error", e.getClass().getName());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
