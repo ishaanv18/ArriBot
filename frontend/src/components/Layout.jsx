@@ -21,7 +21,6 @@ const Layout = ({ children }) => {
             { path: '/summarize', label: 'Summarizer', icon: FileText },
             { path: '/resume', label: 'Resume', icon: Briefcase },
         ] : [
-        ] : [
             { path: '/auth', label: 'Sign In', icon: LogIn },
         ]),
         { path: '/contact', label: 'Contact', icon: Mail },
