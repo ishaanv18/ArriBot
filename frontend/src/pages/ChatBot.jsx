@@ -47,7 +47,7 @@ const ChatBot = () => {
     };
 
     return (
-        <div className="min-h-screen bg-void-base text-white p-4 md:p-8 flex flex-col items-center">
+        <div className="min-h-screen bg-void-base text-white p-4 md:p-8 pb-28 flex flex-col items-center">
             {/* Header */}
             <div className="w-full max-w-4xl flex items-center justify-between mb-8">
                 <div>
@@ -87,8 +87,8 @@ const ChatBot = () => {
                                 </div>
 
                                 <div className={`max-w-[80%] p-4 rounded-2xl border backdrop-blur-md ${message.role === 'user'
-                                        ? 'bg-cyan-950/30 border-cyan-500/20 text-cyan-100 rounded-tr-none'
-                                        : 'bg-glass-base border-white/10 text-white/90 rounded-tl-none'
+                                    ? 'bg-cyan-950/30 border-cyan-500/20 text-cyan-100 rounded-tr-none'
+                                    : 'bg-glass-base border-white/10 text-white/90 rounded-tl-none'
                                     }`}>
                                     <p className="whitespace-pre-wrap text-sm leading-relaxed font-sans">{message.content}</p>
                                     <div className="mt-2 text-[10px] font-mono opacity-40 uppercase">
