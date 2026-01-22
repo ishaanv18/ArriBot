@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { authAPI } from '../utils/api';
 import { LiquidInput } from '../components/ui/LiquidInput';
 import { ScrambleText } from '../components/ui/ScrambleText';
 import { GlassPillButton } from '../components/ui/GlassPillButton';
@@ -48,21 +49,37 @@ export default function Auth() {
                 if (formData.password !== formData.confirmPassword) {
                     throw new Error("Code Mismatch");
                 }
-                await signup(formData);
+
+                // Real API Call
+                await authAPI.signup(formData.fullName, formData.email, formData.password);
+
                 toast.success("Identity Created. Proceed", { icon: '🆔' });
-                // Only navigate after successful await
                 navigate('/verify-otp', { state: { email: formData.email } });
             } else {
-                await login({ email: formData.email, password: formData.password });
+                // Real API Call
+                const response = await authAPI.signin(formData.email, formData.password);
+
+                // Update Context with Token & User from response
+                // Response structure assumed to be { token: "...", type: "...", id: ..., username: "...", email: "...", roles: [...] } based on standard JWT responses
+                // Or standardized { status: "success", data: { token, user } }
+
+                // Let's inspect typical response from backend (Spring Boot usually returns direct object)
+                // We'll trust the response contains 'token' and user details.
+                const { accessToken, tokenType, ...userData } = response.data;
+                const token = accessToken || response.data.token; // Fallback
+
+                if (!token) throw new Error("Security Token Missing");
+
+                login(token, userData);
+
                 toast.success("Access Granted", { icon: '🔓' });
-                // Only navigate after successful await
                 navigate('/dashboard');
             }
         } catch (error) {
             console.error(error);
-            const msg = error.response?.data?.message || error.message || "Access Denied";
+            const msg = error.response?.data?.message || "Access Denied";
             toast.error(msg, { icon: '🛑' });
-            setIsLoading(false); // Only stop loading on error to keep UI stable during nav
+            setIsLoading(false);
         }
     };
 
