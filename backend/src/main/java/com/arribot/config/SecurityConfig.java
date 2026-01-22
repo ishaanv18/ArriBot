@@ -34,6 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/quiz/**").permitAll()
                         .requestMatchers("/api/summarize/**").permitAll()
                         .requestMatchers("/api/resume/**").permitAll()
+                        .requestMatchers("/api/ai/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

@@ -15,7 +15,8 @@ const getUserId = () => {
         const userStr = localStorage.getItem('user');
         if (userStr && userStr !== "undefined") {
             const user = JSON.parse(userStr);
-            return user.id || user._id; // Handle both id formats
+            // Try multiple possible ID fields, fallback to email
+            return user.id || user._id || user.userId || user.email;
         }
     } catch (e) {
         console.error("Error reading user from storage", e);
