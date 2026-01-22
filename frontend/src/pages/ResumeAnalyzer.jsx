@@ -340,12 +340,126 @@ export default function ResumeAnalyzer() {
                     ) : analysisResult ? (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
+                            {/* Role Suitability Card */}
+                            {analysisResult.roleSuitability && (
+                                <div className={`relative overflow-hidden rounded-2xl border-2 p-6 ${analysisResult.roleSuitability.isSuitable
+                                        ? 'bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border-emerald-500/30'
+                                        : 'bg-gradient-to-br from-rose-500/10 to-orange-500/10 border-rose-500/30'
+                                    }`}>
+                                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                                        {analysisResult.roleSuitability.isSuitable ? (
+                                            <CheckCircle size={120} className="text-emerald-400" />
+                                        ) : (
+                                            <AlertCircle size={120} className="text-rose-400" />
+                                        )}
+                                    </div>
+
+                                    <div className="relative z-10">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div>
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    {analysisResult.roleSuitability.isSuitable ? (
+                                                        <CheckCircle size={28} className="text-emerald-400" />
+                                                    ) : (
+                                                        <AlertCircle size={28} className="text-rose-400" />
+                                                    )}
+                                                    <h3 className="text-2xl font-display font-bold">
+                                                        Role Suitability Assessment
+                                                    </h3>
+                                                </div>
+                                                <p className="text-xs font-mono text-white/40 uppercase">
+                                                    For: {analysisResult.targetRole || 'Target Role'}
+                                                </p>
+                                            </div>
+                                            <div className={`px-4 py-2 rounded-xl border-2 font-display font-bold text-sm ${analysisResult.roleSuitability.isSuitable
+                                                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
+                                                    : 'bg-rose-500/20 border-rose-500/50 text-rose-400'
+                                                }`}>
+                                                {analysisResult.roleSuitability.isSuitable ? '✓ SUITABLE' : '⚠ NOT SUITABLE'}
+                                            </div>
+                                        </div>
+
+                                        {/* Suitability Score */}
+                                        <div className="mb-4">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="text-xs font-mono text-white/60 uppercase">Suitability Score</span>
+                                                <span className={`text-2xl font-display font-bold ${analysisResult.roleSuitability.isSuitable ? 'text-emerald-400' : 'text-rose-400'
+                                                    }`}>
+                                                    {analysisResult.roleSuitability.suitabilityScore || 0}%
+                                                </span>
+                                            </div>
+                                            <div className="h-3 bg-white/5 rounded-full overflow-hidden">
+                                                <motion.div
+                                                    className={`h-full rounded-full ${analysisResult.roleSuitability.isSuitable
+                                                            ? 'bg-gradient-to-r from-emerald-400 to-cyan-400'
+                                                            : 'bg-gradient-to-r from-rose-400 to-orange-400'
+                                                        }`}
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${analysisResult.roleSuitability.suitabilityScore || 0}%` }}
+                                                    transition={{ duration: 1.5, ease: "easeOut" }}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Suitability Reason */}
+                                        <div className="bg-black/30 rounded-xl p-4 mb-4">
+                                            <h4 className="text-sm font-mono text-white/60 uppercase mb-2">Assessment</h4>
+                                            <p className="text-white/90 leading-relaxed">
+                                                {analysisResult.roleSuitability.suitabilityReason || 'No assessment available'}
+                                            </p>
+                                        </div>
+
+                                        {/* Key Strengths & Critical Gaps */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {/* Key Strengths */}
+                                            {analysisResult.roleSuitability.keyStrengths?.length > 0 && (
+                                                <div className="bg-black/30 rounded-xl p-4">
+                                                    <h4 className="text-sm font-mono text-emerald-400 uppercase mb-3 flex items-center gap-2">
+                                                        <CheckCircle size={14} />
+                                                        Key Strengths
+                                                    </h4>
+                                                    <ul className="space-y-2">
+                                                        {analysisResult.roleSuitability.keyStrengths.map((strength, i) => (
+                                                            <li key={i} className="text-sm text-white/70 flex items-start gap-2">
+                                                                <span className="text-emerald-400 mt-1">•</span>
+                                                                <span>{strength}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {/* Critical Gaps */}
+                                            {analysisResult.roleSuitability.criticalGaps?.length > 0 && (
+                                                <div className="bg-black/30 rounded-xl p-4">
+                                                    <h4 className="text-sm font-mono text-rose-400 uppercase mb-3 flex items-center gap-2">
+                                                        <AlertCircle size={14} />
+                                                        Critical Gaps
+                                                    </h4>
+                                                    <ul className="space-y-2">
+                                                        {analysisResult.roleSuitability.criticalGaps.map((gap, i) => (
+                                                            <li key={i} className="text-sm text-white/70 flex items-start gap-2">
+                                                                <span className="text-rose-400 mt-1">•</span>
+                                                                <span>{gap}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Quality Scores Section */}
                             <div className="bg-gradient-to-br from-violet-500/10 to-cyan-500/10 border border-white/10 rounded-2xl p-6">
-                                <h3 className="text-xl font-display mb-6 flex items-center gap-2">
+                                <h3 className="text-xl font-display mb-2 flex items-center gap-2">
                                     <span className="w-2 h-8 bg-violet-500 rounded-full" />
                                     QUALITY METRICS
                                 </h3>
+                                <p className="text-xs font-mono text-white/40 uppercase mb-6">
+                                    For: {analysisResult.targetRole || 'Target Role'}
+                                </p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <QualityBar label="Overall Score" score={analysisResult.overallScore || 0} color="#a78bfa" />
                                     <QualityBar label="Skill Match" score={analysisResult.skillMatchScore || 0} color="#22d3ee" />

@@ -67,6 +67,13 @@ public class GroqResumeAnalyzer {
               "skillMatchScore": <0-100>,
               "experienceScore": <0-100>,
               "resumeQualityScore": <0-100>,
+              "roleSuitability": {
+                "isSuitable": <true/false>,
+                "suitabilityScore": <0-100>,
+                "suitabilityReason": "detailed explanation of why the resume is or isn't suitable for this specific role",
+                "keyStrengths": ["strength1", "strength2", ...],
+                "criticalGaps": ["gap1", "gap2", ...]
+              },
               "learningPath": [
                 {
                   "skill": "skill name",
@@ -85,11 +92,17 @@ public class GroqResumeAnalyzer {
             4. Recommend skills that would make the candidate more competitive
             5. Create a prioritized learning path with specific, actionable recommendations
             6. For each learning recommendation, explain WHY it's important for the target role
-            7. Calculate quality scores (0-100):
+            7. Calculate quality scores (0-100) SPECIFICALLY FOR THE TARGET ROLE:
                - overallScore: Overall resume quality and fit for the target role
                - skillMatchScore: How well skills match the target role requirements
-               - experienceScore: Quality and relevance of work experience
+               - experienceScore: Quality and relevance of work experience for this role
                - resumeQualityScore: Resume formatting, clarity, and presentation quality
+            8. Role Suitability Assessment:
+               - isSuitable: true if the candidate is a good fit for the role (skillMatchScore >= 70 AND experienceScore >= 60), false otherwise
+               - suitabilityScore: Overall suitability percentage (0-100) based on all factors
+               - suitabilityReason: 2-3 sentences explaining why they are/aren't suitable, be specific about role requirements
+               - keyStrengths: 3-5 specific strengths that make them suitable (or would if improved)
+               - criticalGaps: 2-4 most important missing elements that prevent suitability (empty if suitable)
             
             Return ONLY valid JSON, no additional text.
             """, targetRole != null ? targetRole : "General Software Developer", resumeText);
@@ -212,6 +225,36 @@ public class GroqResumeAnalyzer {
                 result.setResumeQualityScore(json.get("resumeQualityScore").getAsInt());
             }
             
+            // Extract role suitability
+            if (json.has("roleSuitability")) {
+                JsonObject suitabilityJson = json.getAsJsonObject("roleSuitability");
+                RoleSuitability suitability = new RoleSuitability();
+                
+                if (suitabilityJson.has("isSuitable")) {
+                    suitability.setIsSuitable(suitabilityJson.get("isSuitable").getAsBoolean());
+                }
+                if (suitabilityJson.has("suitabilityScore")) {
+                    suitability.setSuitabilityScore(suitabilityJson.get("suitabilityScore").getAsInt());
+                }
+                if (suitabilityJson.has("suitabilityReason")) {
+                    suitability.setSuitabilityReason(suitabilityJson.get("suitabilityReason").getAsString());
+                }
+                if (suitabilityJson.has("keyStrengths")) {
+                    JsonArray strengths = suitabilityJson.getAsJsonArray("keyStrengths");
+                    List<String> strengthsList = new ArrayList<>();
+                    strengths.forEach(s -> strengthsList.add(s.getAsString()));
+                    suitability.setKeyStrengths(strengthsList);
+                }
+                if (suitabilityJson.has("criticalGaps")) {
+                    JsonArray gaps = suitabilityJson.getAsJsonArray("criticalGaps");
+                    List<String> gapsList = new ArrayList<>();
+                    gaps.forEach(g -> gapsList.add(g.getAsString()));
+                    suitability.setCriticalGaps(gapsList);
+                }
+                
+                result.setRoleSuitability(suitability);
+            }
+            
             return result;
             
         } catch (Exception e) {
@@ -226,6 +269,29 @@ public class GroqResumeAnalyzer {
     /**
      * Result class for skill analysis
      */
+    public static class RoleSuitability {
+        private Boolean isSuitable = false;
+        private Integer suitabilityScore = 0;
+        private String suitabilityReason = "";
+        private List<String> keyStrengths = new ArrayList<>();
+        private List<String> criticalGaps = new ArrayList<>();
+
+        public Boolean getIsSuitable() { return isSuitable; }
+        public void setIsSuitable(Boolean isSuitable) { this.isSuitable = isSuitable; }
+
+        public Integer getSuitabilityScore() { return suitabilityScore; }
+        public void setSuitabilityScore(Integer suitabilityScore) { this.suitabilityScore = suitabilityScore; }
+
+        public String getSuitabilityReason() { return suitabilityReason; }
+        public void setSuitabilityReason(String suitabilityReason) { this.suitabilityReason = suitabilityReason; }
+
+        public List<String> getKeyStrengths() { return keyStrengths; }
+        public void setKeyStrengths(List<String> keyStrengths) { this.keyStrengths = keyStrengths; }
+
+        public List<String> getCriticalGaps() { return criticalGaps; }
+        public void setCriticalGaps(List<String> criticalGaps) { this.criticalGaps = criticalGaps; }
+    }
+
     public static class SkillAnalysisResult {
         private List<String> detectedSkills = new ArrayList<>();
         private Integer experienceYears = 0;
@@ -236,6 +302,7 @@ public class GroqResumeAnalyzer {
         private Integer skillMatchScore = 0;
         private Integer experienceScore = 0;
         private Integer resumeQualityScore = 0;
+        private RoleSuitability roleSuitability = new RoleSuitability();
 
         // Getters and Setters
         public List<String> getDetectedSkills() {
@@ -308,6 +375,14 @@ public class GroqResumeAnalyzer {
 
         public void setResumeQualityScore(Integer resumeQualityScore) {
             this.resumeQualityScore = resumeQualityScore;
+        }
+
+        public RoleSuitability getRoleSuitability() {
+            return roleSuitability;
+        }
+
+        public void setRoleSuitability(RoleSuitability roleSuitability) {
+            this.roleSuitability = roleSuitability;
         }
     }
 }
