@@ -14,6 +14,7 @@ import Dashboard from './pages/Dashboard';
 import ChatBot from './pages/ChatBot';
 import Flashcards from './pages/Flashcards';
 import QuizGenerator from './pages/QuizGenerator';
+import Summarization from './pages/Summarization';
 import ResumeAnalyzer from './pages/ResumeAnalyzer';
 
 function App() {
