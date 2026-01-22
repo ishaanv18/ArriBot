@@ -57,6 +57,12 @@ public class GroqResumeAnalyzer {
             RESUME TEXT:
             %s
             
+            CRITICAL INSTRUCTIONS:
+            - You MUST evaluate this resume STRICTLY for the TARGET ROLE specified above
+            - If the resume's skills/experience DO NOT match the target role, give LOW scores
+            - If there is a clear mismatch (e.g., technical resume for non-technical role), scores should be very low, even 0
+            - Be honest and accurate - do not inflate scores for mismatched roles
+            
             Please analyze this resume and provide a JSON response with the following structure:
             {
               "detectedSkills": ["skill1", "skill2", ...],
@@ -88,21 +94,57 @@ public class GroqResumeAnalyzer {
             Guidelines:
             1. Extract ALL technical and soft skills mentioned in the resume
             2. Estimate years of experience based on work history
-            3. Identify skills commonly required for the target role that are missing
-            4. Recommend skills that would make the candidate more competitive
+            3. Identify skills commonly required for the TARGET ROLE that are missing
+            4. Recommend skills that would make the candidate more competitive FOR THIS SPECIFIC ROLE
             5. Create a prioritized learning path with specific, actionable recommendations
             6. For each learning recommendation, explain WHY it's important for the target role
-            7. Calculate quality scores (0-100) SPECIFICALLY FOR THE TARGET ROLE:
-               - overallScore: Overall resume quality and fit for the target role
-               - skillMatchScore: How well skills match the target role requirements
-               - experienceScore: Quality and relevance of work experience for this role
+            
+            7. Calculate quality scores (0-100) STRICTLY BASED ON THE TARGET ROLE:
+               - overallScore: Overall resume quality and fit for THIS SPECIFIC TARGET ROLE
+                 * If resume is for a completely different field, this should be 0-30
+                 * If resume has some transferable skills, this should be 30-50
+                 * If resume is a good match, this should be 70-100
+               
+               - skillMatchScore: How well skills match THIS SPECIFIC TARGET ROLE requirements
+                 * Compare resume skills ONLY to what the target role needs
+                 * If skills are completely unrelated (e.g., coding skills for air hostess), score should be 0-20
+                 * If skills are somewhat transferable, score should be 20-50
+                 * If skills directly match the role, score should be 70-100
+               
+               - experienceScore: Quality and relevance of work experience FOR THIS SPECIFIC ROLE
+                 * If experience is in a completely different field, score should be 0-30
+                 * If experience has some transferable aspects, score should be 30-60
+                 * If experience is directly relevant, score should be 70-100
+               
                - resumeQualityScore: Resume formatting, clarity, and presentation quality
-            8. Role Suitability Assessment:
-               - isSuitable: true if the candidate is a good fit for the role (skillMatchScore >= 70 AND experienceScore >= 60), false otherwise
-               - suitabilityScore: Overall suitability percentage (0-100) based on all factors
-               - suitabilityReason: 2-3 sentences explaining why they are/aren't suitable, be specific about role requirements
-               - keyStrengths: 3-5 specific strengths that make them suitable (or would if improved)
-               - criticalGaps: 2-4 most important missing elements that prevent suitability (empty if suitable)
+                 * This is the ONLY score that is role-independent
+                 * Evaluate based on formatting, structure, clarity, grammar
+            
+            8. Role Suitability Assessment (BE VERY STRICT):
+               - isSuitable: Set to TRUE only if:
+                 * skillMatchScore >= 70 AND experienceScore >= 60
+                 * The candidate's background genuinely fits the target role
+                 * Otherwise, set to FALSE
+               
+               - suitabilityScore: Overall suitability percentage (0-100)
+                 * This should reflect realistic fit for the role
+                 * For mismatched roles, this should be 0-30
+               
+               - suitabilityReason: 2-3 sentences explaining why they are/aren't suitable
+                 * Be specific about the target role requirements
+                 * Clearly state if there's a mismatch (e.g., "This resume shows strong technical/software development skills, but the target role of Air Hostess requires customer service, communication, and safety training skills which are not evident in this resume.")
+               
+               - keyStrengths: 3-5 specific strengths relative to the target role
+                 * If resume is unsuitable, list transferable skills or general strengths
+               
+               - criticalGaps: 2-4 most important missing elements for the target role
+                 * Be specific about what the target role needs that the resume lacks
+                 * For major mismatches, list the core requirements of the target role
+            
+            EXAMPLES OF CORRECT SCORING:
+            - Software Developer resume for "Air Hostess": skillMatchScore=10-20, experienceScore=10-20, overallScore=15-25, isSuitable=false
+            - Software Developer resume for "Software Engineer": skillMatchScore=80-95, experienceScore=80-95, overallScore=85-95, isSuitable=true
+            - Marketing resume for "Data Scientist": skillMatchScore=15-25, experienceScore=15-25, overallScore=20-30, isSuitable=false
             
             Return ONLY valid JSON, no additional text.
             """, targetRole != null ? targetRole : "General Software Developer", resumeText);
