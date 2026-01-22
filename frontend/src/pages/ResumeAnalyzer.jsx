@@ -105,7 +105,18 @@ export default function ResumeAnalyzer() {
             try {
                 const existing = await resumeService.getAnalysis(selectedResume.id);
                 if (existing.success && existing.analysis.targetRole === targetRole) {
-                    setAnalysisResult(existing.analysis);
+                    // Transform existing analysis too
+                    const transformedAnalysis = {
+                        ...existing.analysis,
+                        roleSuitability: {
+                            isSuitable: existing.analysis.isSuitable,
+                            suitabilityScore: existing.analysis.suitabilityScore,
+                            suitabilityReason: existing.analysis.suitabilityReason,
+                            keyStrengths: existing.analysis.keyStrengths,
+                            criticalGaps: existing.analysis.criticalGaps
+                        }
+                    };
+                    setAnalysisResult(transformedAnalysis);
                     setAnalyzingId(null);
                     return;
                 }
@@ -116,7 +127,18 @@ export default function ResumeAnalyzer() {
             // Generate new analysis
             const data = await resumeService.analyzeResume(selectedResume.id, targetRole);
             if (data.success) {
-                setAnalysisResult(data.analysis);
+                // Transform backend response to include roleSuitability object
+                const transformedAnalysis = {
+                    ...data.analysis,
+                    roleSuitability: {
+                        isSuitable: data.analysis.isSuitable,
+                        suitabilityScore: data.analysis.suitabilityScore,
+                        suitabilityReason: data.analysis.suitabilityReason,
+                        keyStrengths: data.analysis.keyStrengths,
+                        criticalGaps: data.analysis.criticalGaps
+                    }
+                };
+                setAnalysisResult(transformedAnalysis);
                 toast.success("Analysis Complete");
             }
         } catch (error) {
@@ -343,8 +365,8 @@ export default function ResumeAnalyzer() {
                             {/* Role Suitability Card */}
                             {analysisResult.roleSuitability && (
                                 <div className={`relative overflow-hidden rounded-2xl border-2 p-6 ${analysisResult.roleSuitability.isSuitable
-                                        ? 'bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border-emerald-500/30'
-                                        : 'bg-gradient-to-br from-rose-500/10 to-orange-500/10 border-rose-500/30'
+                                    ? 'bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border-emerald-500/30'
+                                    : 'bg-gradient-to-br from-rose-500/10 to-orange-500/10 border-rose-500/30'
                                     }`}>
                                     <div className="absolute top-0 right-0 p-4 opacity-10">
                                         {analysisResult.roleSuitability.isSuitable ? (
@@ -372,8 +394,8 @@ export default function ResumeAnalyzer() {
                                                 </p>
                                             </div>
                                             <div className={`px-4 py-2 rounded-xl border-2 font-display font-bold text-sm ${analysisResult.roleSuitability.isSuitable
-                                                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
-                                                    : 'bg-rose-500/20 border-rose-500/50 text-rose-400'
+                                                ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
+                                                : 'bg-rose-500/20 border-rose-500/50 text-rose-400'
                                                 }`}>
                                                 {analysisResult.roleSuitability.isSuitable ? '✓ SUITABLE' : '⚠ NOT SUITABLE'}
                                             </div>
@@ -391,8 +413,8 @@ export default function ResumeAnalyzer() {
                                             <div className="h-3 bg-white/5 rounded-full overflow-hidden">
                                                 <motion.div
                                                     className={`h-full rounded-full ${analysisResult.roleSuitability.isSuitable
-                                                            ? 'bg-gradient-to-r from-emerald-400 to-cyan-400'
-                                                            : 'bg-gradient-to-r from-rose-400 to-orange-400'
+                                                        ? 'bg-gradient-to-r from-emerald-400 to-cyan-400'
+                                                        : 'bg-gradient-to-r from-rose-400 to-orange-400'
                                                         }`}
                                                     initial={{ width: 0 }}
                                                     animate={{ width: `${analysisResult.roleSuitability.suitabilityScore || 0}%` }}

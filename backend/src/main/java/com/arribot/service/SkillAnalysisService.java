@@ -55,6 +55,15 @@ public class SkillAnalysisService {
         analysis.setSkillMatchScore(aiResult.getSkillMatchScore());
         analysis.setExperienceScore(aiResult.getExperienceScore());
         analysis.setResumeQualityScore(aiResult.getResumeQualityScore());
+        
+        // Set role suitability assessment
+        if (aiResult.getRoleSuitability() != null) {
+            analysis.setIsSuitable(aiResult.getRoleSuitability().getIsSuitable());
+            analysis.setSuitabilityScore(aiResult.getRoleSuitability().getSuitabilityScore());
+            analysis.setSuitabilityReason(aiResult.getRoleSuitability().getSuitabilityReason());
+            analysis.setKeyStrengths(aiResult.getRoleSuitability().getKeyStrengths());
+            analysis.setCriticalGaps(aiResult.getRoleSuitability().getCriticalGaps());
+        }
 
         return skillAnalysisRepository.save(analysis);
     }

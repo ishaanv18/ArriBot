@@ -30,6 +30,13 @@ public class SkillAnalysis {
     private Integer skillMatchScore = 0;
     private Integer experienceScore = 0;
     private Integer resumeQualityScore = 0;
+    
+    // Role Suitability Assessment
+    private Boolean isSuitable = false;
+    private Integer suitabilityScore = 0;
+    private String suitabilityReason = "";
+    private List<String> keyStrengths = new ArrayList<>();
+    private List<String> criticalGaps = new ArrayList<>();
 
     // Constructors
     public SkillAnalysis() {
@@ -145,5 +152,45 @@ public class SkillAnalysis {
 
     public void setResumeQualityScore(Integer resumeQualityScore) {
         this.resumeQualityScore = resumeQualityScore;
+    }
+
+    public Boolean getIsSuitable() {
+        return isSuitable;
+    }
+
+    public void setIsSuitable(Boolean isSuitable) {
+        this.isSuitable = isSuitable;
+    }
+
+    public Integer getSuitabilityScore() {
+        return suitabilityScore;
+    }
+
+    public void setSuitabilityScore(Integer suitabilityScore) {
+        this.suitabilityScore = suitabilityScore;
+    }
+
+    public String getSuitabilityReason() {
+        return suitabilityReason;
+    }
+
+    public void setSuitabilityReason(String suitabilityReason) {
+        this.suitabilityReason = suitabilityReason;
+    }
+
+    public List<String> getKeyStrengths() {
+        return keyStrengths;
+    }
+
+    public void setKeyStrengths(List<String> keyStrengths) {
+        this.keyStrengths = keyStrengths;
+    }
+
+    public List<String> getCriticalGaps() {
+        return criticalGaps;
+    }
+
+    public void setCriticalGaps(List<String> criticalGaps) {
+        this.criticalGaps = criticalGaps;
     }
 }
