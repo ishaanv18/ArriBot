@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { chatAPI } from '../utils/api';
-
-const AVATARS = ['👨‍💻', '👩‍💻', '🦸‍♂️', '🦸‍♀️', '🧙‍♂️', '🧙‍♀️', '🤖', '👽', '🦊', '🐱', '🐶', '🦄'];
+import { MessageSquare, Send, Cpu, User, RefreshCw, Zap } from 'lucide-react';
+import { ScrambleText } from '../components/ui/ScrambleText';
 
 const ChatBot = () => {
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [sessionId] = useState(() => `session-${Date.now()}`);
-    const [userAvatar, setUserAvatar] = useState('👨‍💻');
-    const [showAvatarSelector, setShowAvatarSelector] = useState(false);
     const messagesEndRef = useRef(null);
+    const inputRef = useRef(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -28,113 +27,74 @@ const ChatBot = () => {
         const userMessage = inputMessage.trim();
         setInputMessage('');
 
-        // Add user message to chat
-        setMessages(prev => [...prev, { role: 'user', content: userMessage, avatar: userAvatar }]);
+        setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
         setIsLoading(true);
 
         try {
             const response = await chatAPI.sendMessage(userMessage, sessionId);
-            setMessages(prev => [...prev, { role: 'ai', content: response.data.aiResponse, avatar: '🤖' }]);
+            setMessages(prev => [...prev, { role: 'ai', content: response.data.aiResponse }]);
         } catch (error) {
             console.error('Error sending message:', error);
             setMessages(prev => [...prev, {
                 role: 'ai',
-                content: 'Sorry, I encountered an error. Please try again.',
-                avatar: '🤖'
+                content: 'Error: Neural Link Disrupted. Please retry transmission.'
             }]);
         } finally {
             setIsLoading(false);
+            // Re-focus input after sending
+            setTimeout(() => inputRef.current?.focus(), 100);
         }
     };
 
     return (
-        <div className="max-w-5xl mx-auto">
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center mb-8"
-            >
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
-                    AI ChatBot
-                </h1>
-                <p className="text-gray-600 text-lg mb-6">
-                    Ask me anything about coding, learning, or general questions!
-                </p>
-
-                {/* Avatar Selector */}
-                <div className="relative inline-block">
-                    <button
-                        onClick={() => setShowAvatarSelector(!showAvatarSelector)}
-                        className="flex items-center space-x-2 bg-white px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-300 border border-purple-100"
-                    >
-                        <span className="text-gray-600">Your Avatar:</span>
-                        <span className="text-2xl">{userAvatar}</span>
-                        <span className="text-xs text-purple-500">▼</span>
-                    </button>
-
-                    <AnimatePresence>
-                        {showAvatarSelector && (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                                className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-64 bg-white rounded-xl shadow-xl border border-purple-100 p-4 z-20 grid grid-cols-4 gap-2"
-                            >
-                                {AVATARS.map((avatar) => (
-                                    <button
-                                        key={avatar}
-                                        onClick={() => {
-                                            setUserAvatar(avatar);
-                                            setShowAvatarSelector(false);
-                                        }}
-                                        className={`text-2xl p-2 rounded-lg hover:bg-purple-50 transition-colors ${userAvatar === avatar ? 'bg-purple-100 ring-2 ring-purple-400' : ''}`}
-                                    >
-                                        {avatar}
-                                    </button>
-                                ))}
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+        <div className="min-h-screen bg-void-base text-white p-4 md:p-8 flex flex-col items-center">
+            {/* Header */}
+            <div className="w-full max-w-4xl flex items-center justify-between mb-8">
+                <div>
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse-fast" />
+                        <span className="text-xs font-mono text-cyan-400 tracking-widest">NEURAL_LINK // V.2.1</span>
+                    </div>
+                    <h1 className="text-3xl font-display font-bold"><ScrambleText text="AI COMPAGNION" /></h1>
                 </div>
-            </motion.div>
+                <Cpu className="text-white/20" size={32} />
+            </div>
 
-            <div className="glass rounded-2xl shadow-2xl overflow-hidden relative z-10">
-                {/* Chat Messages */}
-                <div className="h-[500px] overflow-y-auto p-6 space-y-6">
+            {/* Chat Interface */}
+            <div className="w-full max-w-4xl flex-1 flex flex-col bg-glass-base backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden relative h-[70vh]">
+                {/* Grid Overlay */}
+                <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
+
+                {/* Messages Area */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                     <AnimatePresence>
                         {messages.length === 0 && (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="text-center text-gray-400 mt-20"
-                            >
-                                <div className="text-6xl mb-4 animate-bounce">💬</div>
-                                <p className="text-lg">Start a conversation by typing a message below</p>
-                            </motion.div>
+                            <div className="h-full flex flex-col items-center justify-center text-white/30">
+                                <Zap size={48} className="mb-4 opacity-50" />
+                                <p className="font-mono text-sm">INITIALIZE CONVERSATION SEQUENCE...</p>
+                            </div>
                         )}
 
                         {messages.map((message, index) => (
                             <motion.div
                                 key={index}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className={`flex items-end space-x-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                                initial={{ opacity: 0, x: message.role === 'user' ? 20 : -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className={`flex items-start gap-4 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
                             >
-                                {message.role === 'ai' && (
-                                    <div className="avatar avatar-ai flex-shrink-0">
-                                        {message.avatar || '🤖'}
-                                    </div>
-                                )}
-
-                                <div className={`${message.role === 'user' ? 'message-user order-1' : 'message-ai'}`}>
-                                    <p className="whitespace-pre-wrap">{message.content}</p>
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border ${message.role === 'user' ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400' : 'bg-violet-500/10 border-violet-500/30 text-violet-400'}`}>
+                                    {message.role === 'user' ? <User size={14} /> : <Cpu size={14} />}
                                 </div>
 
-                                {message.role === 'user' && (
-                                    <div className="avatar avatar-user flex-shrink-0 ml-3">
-                                        {message.avatar || userAvatar}
+                                <div className={`max-w-[80%] p-4 rounded-2xl border backdrop-blur-md ${message.role === 'user'
+                                        ? 'bg-cyan-950/30 border-cyan-500/20 text-cyan-100 rounded-tr-none'
+                                        : 'bg-glass-base border-white/10 text-white/90 rounded-tl-none'
+                                    }`}>
+                                    <p className="whitespace-pre-wrap text-sm leading-relaxed font-sans">{message.content}</p>
+                                    <div className="mt-2 text-[10px] font-mono opacity-40 uppercase">
+                                        {message.role === 'user' ? 'Transmission_Sent' : 'Process_ID: ' + Math.random().toString(16).substr(2, 6)}
                                     </div>
-                                )}
+                                </div>
                             </motion.div>
                         ))}
 
@@ -142,15 +102,15 @@ const ChatBot = () => {
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="flex justify-start items-end space-x-3"
+                                className="flex items-start gap-4"
                             >
-                                <div className="avatar avatar-ai flex-shrink-0">🤖</div>
-                                <div className="message-ai">
-                                    <div className="flex space-x-2">
-                                        <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
-                                        <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                                        <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-                                    </div>
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border bg-violet-500/10 border-violet-500/30 text-violet-400">
+                                    <Cpu size={14} />
+                                </div>
+                                <div className="flex gap-1 items-center h-10 px-4">
+                                    <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
+                                    <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                                    <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
                                 </div>
                             </motion.div>
                         )}
@@ -158,27 +118,27 @@ const ChatBot = () => {
                     <div ref={messagesEndRef} />
                 </div>
 
-                {/* Input Form */}
-                <form onSubmit={handleSendMessage} className="border-t border-purple-200 p-4 bg-white/50 backdrop-blur-sm">
-                    <div className="flex space-x-4">
+                {/* Input Area */}
+                <div className="p-4 bg-black/20 border-t border-white/10">
+                    <form onSubmit={handleSendMessage} className="relative flex items-center gap-4">
                         <input
+                            ref={inputRef}
                             type="text"
                             value={inputMessage}
                             onChange={(e) => setInputMessage(e.target.value)}
-                            placeholder="Type your message here..."
-                            className="input-field flex-1 bg-white/80"
+                            placeholder="Input command or query..."
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-white/30 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all font-mono text-sm"
                             disabled={isLoading}
                         />
                         <button
                             type="submit"
                             disabled={isLoading || !inputMessage.trim()}
-                            className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                            className="absolute right-2 p-2 bg-cyan-500/10 text-cyan-400 rounded-lg hover:bg-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
-                            <span className="hidden sm:inline">Send</span>
-                            <span className="text-xl">📤</span>
+                            <Send size={18} />
                         </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     );

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { authAPI } from '../utils/api';
+import { Mail, Send, CheckCircle2, AlertCircle, Signal, Radio, Antenna } from 'lucide-react';
+import { ScrambleText } from '../components/ui/ScrambleText';
+import { TiltCard } from '../components/ui/TiltCard';
 
 const ContactUs = () => {
     const [formData, setFormData] = useState({
@@ -25,172 +28,168 @@ const ContactUs = () => {
                 setTimeout(() => setSuccess(false), 5000);
             }
         } catch (err) {
-            setError('Failed to send message. Please try again.');
+            setError('Signal Lost. Transmission Failed.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen animated-bg py-12 px-4">
-            {/* Floating background elements */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-                <div className="absolute top-20 left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float-slow"></div>
-                <div className="absolute top-40 right-10 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float-medium"></div>
-                <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float-fast"></div>
+        <div className="min-h-screen bg-void-base text-white p-4 md:p-8 flex flex-col items-center">
+
+            {/* Header */}
+            <div className="w-full max-w-5xl flex items-center justify-between mb-12">
+                <div>
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="w-2 h-2 rounded-full bg-orange-400 animate-pulse-fast" />
+                        <span className="text-xs font-mono text-orange-400 tracking-widest">SIGNAL_UPLINK // READY</span>
+                    </div>
+                    <h1 className="text-3xl font-display font-bold"><ScrambleText text="TRANSMIT MESSAGE" /></h1>
+                </div>
+                <Antenna className="text-white/20" size={32} />
             </div>
 
-            <div className="max-w-4xl mx-auto">
+            <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-12">
+
+                {/* Form Section */}
                 <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center mb-12"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="relative"
                 >
-                    <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
-                        Get In Touch
-                    </h1>
-                    <p className="text-gray-600 text-lg">
-                        Have questions? We'd love to hear from you!
-                    </p>
-                </motion.div>
+                    <TiltCard className="bg-glass-base backdrop-blur-xl border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
 
-                <div className="grid md:grid-cols-2 gap-8">
-                    {/* Contact Form */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="glass rounded-2xl shadow-2xl p-8 relative z-10"
-                    >
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6">Send us a message</h2>
+                        <h2 className="text-xl font-display font-medium mb-6 flex items-center gap-2">
+                            <Radio size={18} className="text-orange-400" />
+                            Secure Transmission Protocol
+                        </h2>
 
-                        {success && (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg mb-6"
-                            >
-                                ✓ Message sent successfully! We'll get back to you soon.
-                            </motion.div>
-                        )}
-
-                        {error && (
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-6"
-                            >
-                                {error}
-                            </motion.div>
-                        )}
-
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Your Name
-                                </label>
+                                <label className="block text-xs font-mono text-white/40 mb-2 uppercase tracking-wide">Identifier</label>
                                 <input
                                     type="text"
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="input-field"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:border-orange-500/50 focus:bg-white/10 transition-all font-display tracking-wide"
                                     placeholder="John Doe"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Email Address
-                                </label>
+                                <label className="block text-xs font-mono text-white/40 mb-2 uppercase tracking-wide">Return Frequency (Email)</label>
                                 <input
                                     type="email"
                                     required
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="input-field"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:border-orange-500/50 focus:bg-white/10 transition-all font-display tracking-wide"
                                     placeholder="john@example.com"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Message
-                                </label>
+                                <label className="block text-xs font-mono text-white/40 mb-2 uppercase tracking-wide">Data Packet</label>
                                 <textarea
                                     required
                                     rows={5}
                                     value={formData.message}
                                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                    className="input-field resize-none"
-                                    placeholder="Tell us what's on your mind..."
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:border-orange-500/50 focus:bg-white/10 transition-all font-mono text-sm leading-relaxed resize-none"
+                                    placeholder="Enter transmission content..."
                                 />
                             </div>
 
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                                className="w-full py-4 bg-orange-500/10 border border-orange-500/30 text-orange-300 font-mono font-bold tracking-widest rounded-xl hover:bg-orange-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
                             >
                                 {loading ? (
                                     <>
-                                        <div className="spinner"></div>
-                                        <span>Sending...</span>
+                                        <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                                        <span>UPLOADING...</span>
                                     </>
                                 ) : (
                                     <>
-                                        <span>Send Message</span>
-                                        <span>📤</span>
+                                        <Signal size={18} />
+                                        <span>INITIATE UPLINK</span>
                                     </>
                                 )}
                             </button>
                         </form>
-                    </motion.div>
 
-                    {/* Contact Info */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.4 }}
-                        className="space-y-6"
-                    >
-                        <div className="glass rounded-2xl shadow-xl p-6">
-                            <div className="flex items-start space-x-4">
-                                <div className="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center text-2xl shadow-lg flex-shrink-0">
-                                    📧
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-gray-800 mb-1">Email</h3>
-                                    <p className="text-gray-600">vit1122334@gmail.com</p>
-                                </div>
-                            </div>
-                        </div>
+                        <AnimatePresence>
+                            {success && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute inset-0 bg-glass-base backdrop-blur-xl flex flex-col items-center justify-center z-20"
+                                >
+                                    <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mb-4 text-green-400">
+                                        <CheckCircle2 size={32} />
+                                    </div>
+                                    <h3 className="text-xl font-bold font-display">Message Sent</h3>
+                                    <p className="text-white/40 text-sm font-mono mt-2">Data uplink successful.</p>
+                                </motion.div>
+                            )}
 
-                        <div className="glass rounded-2xl shadow-xl p-6">
-                            <div className="flex items-start space-x-4">
-                                <div className="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center text-2xl shadow-lg flex-shrink-0">
-                                    🤖
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-gray-800 mb-1">AI Support</h3>
-                                    <p className="text-gray-600">Get instant help from our AI ChatBot</p>
-                                </div>
-                            </div>
-                        </div>
+                            {error && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute inset-x-8 bottom-8 bg-red-500/10 border border-red-500/30 p-4 rounded-xl flex items-center gap-3 text-red-300"
+                                >
+                                    <AlertCircle size={18} />
+                                    <span className="text-sm font-mono">{error}</span>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </TiltCard>
+                </motion.div>
 
-                        <div className="glass rounded-2xl shadow-xl p-6">
-                            <div className="flex items-start space-x-4">
-                                <div className="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center text-2xl shadow-lg flex-shrink-0">
-                                    ⏰
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-gray-800 mb-1">Response Time</h3>
-                                    <p className="text-gray-600">We typically respond within 24 hours</p>
-                                </div>
+                {/* Info Section */}
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex flex-col justify-center space-y-6"
+                >
+                    <div className="bg-white/5 border border-white/5 rounded-2xl p-6 hover:bg-white/10 transition-colors group cursor-default">
+                        <div className="flex items-center gap-4 mb-2">
+                            <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform">
+                                <Mail size={20} />
                             </div>
+                            <h3 className="font-display font-medium">Direct Frequency</h3>
                         </div>
-                    </motion.div>
-                </div>
+                        <p className="text-white/40 font-mono text-sm pl-14">vit1122334@gmail.com</p>
+                    </div>
+
+                    <div className="bg-white/5 border border-white/5 rounded-2xl p-6 hover:bg-white/10 transition-colors group cursor-default">
+                        <div className="flex items-center gap-4 mb-2">
+                            <div className="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform">
+                                <Radio size={20} />
+                            </div>
+                            <h3 className="font-display font-medium">AI Support Node</h3>
+                        </div>
+                        <p className="text-white/40 font-mono text-sm pl-14">Automated Neural Response &lt; 2ms</p>
+                    </div>
+
+                    <div className="bg-white/5 border border-white/5 rounded-2xl p-6 hover:bg-white/10 transition-colors group cursor-default">
+                        <div className="flex items-center gap-4 mb-2">
+                            <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+                                <Signal size={20} />
+                            </div>
+                            <h3 className="font-display font-medium">Latency</h3>
+                        </div>
+                        <p className="text-white/40 font-mono text-sm pl-14">Human Response ~ 24h</p>
+                    </div>
+                </motion.div>
+
             </div>
         </div>
     );

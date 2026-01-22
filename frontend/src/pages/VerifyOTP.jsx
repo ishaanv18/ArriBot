@@ -1,226 +1,157 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { authAPI } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
+import { ShieldCheck, Loader2, Fingerprint } from 'lucide-react';
 import toast from 'react-hot-toast';
-import logo from '../assets/arribot-logo-new.png';
+import { ScrambleText } from '../components/ui/ScrambleText';
 
-const VerifyOTP = () => {
-    const navigate = useNavigate();
+export default function VerifyOTP() {
+    const [otp, setOtp] = useState(['', '', '', '', '', '']);
+    const [isLoading, setIsLoading] = useState(false);
+    const inputRefs = useRef([]);
     const location = useLocation();
-    const email = location.state?.email;
+    const navigate = useNavigate();
+    const { verifyOtp } = useAuth(); // Ensure this exists in your AuthContext
 
-    const [otp, setOtp] = useState(['', '', '', '']);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [resending, setResending] = useState(false);
+    const email = location.state?.email || '';
 
     useEffect(() => {
         if (!email) {
-            navigate('/signup');
+            toast.error('Session expired. Please restart protocol.');
+            navigate('/auth');
         }
     }, [email, navigate]);
 
     const handleChange = (index, value) => {
-        if (value.length > 1) return;
-        if (!/^\d*$/.test(value)) return;
+        if (value.length > 1) return; // Prevent multiple chars
+        if (isNaN(value)) return; // Only numbers
 
         const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
 
         // Auto-focus next input
-        if (value && index < 3) {
-            document.getElementById(`otp-${index + 1}`)?.focus();
+        if (value && index < 5) {
+            inputRefs.current[index + 1].focus();
         }
     };
 
     const handleKeyDown = (index, e) => {
         if (e.key === 'Backspace' && !otp[index] && index > 0) {
-            document.getElementById(`otp-${index - 1}`)?.focus();
+            inputRefs.current[index - 1].focus();
         }
+    };
+
+    const handlePaste = (e) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text').slice(0, 6);
+        if (!/^\d+$/.test(pastedData)) return;
+
+        const newOtp = [...otp];
+        pastedData.split('').forEach((char, i) => {
+            if (i < 6) newOtp[i] = char;
+        });
+        setOtp(newOtp);
+        inputRefs.current[Math.min(pastedData.length, 5)].focus();
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const otpCode = otp.join('');
-
-        if (otpCode.length !== 4) {
-            setError('Please enter all 4 digits');
+        if (otpCode.length < 6) {
+            toast.error('Incomplete Sequence');
             return;
         }
 
-        setLoading(true);
-        setError('');
-
+        setIsLoading(true);
         try {
-            const response = await authAPI.verifyOTP(email, otpCode);
-            if (response.data.success) {
-                navigate('/signin', { state: { verified: true } });
-            }
-        } catch (err) {
-            setError(err.response?.data?.message || 'Invalid OTP. Please try again.');
-            setOtp(['', '', '', '']);
-            document.getElementById('otp-0')?.focus();
+            await verifyOtp(email, otpCode);
+            toast.success('Identity Verified', { icon: '🔓' });
+            navigate('/dashboard');
+        } catch (error) {
+            console.error('Verification failed', error);
+            const message = error.response?.data?.message || 'Protocol Mismatch';
+            toast.error(message);
+            setOtp(['', '', '', '', '', '']);
+            inputRefs.current[0].focus();
         } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleResend = async () => {
-        setResending(true);
-        setError('');
-
-        try {
-            await authAPI.resendOTP(email);
-            setOtp(['', '', '', '']);
-            document.getElementById('otp-0')?.focus();
-            toast.success('New OTP sent! Check your email.', {
-                duration: 4000,
-                icon: '📧',
-            });
-        } catch (err) {
-            setError('Failed to resend OTP. Please try again.');
-        } finally {
-            setResending(false);
+            setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen animated-bg flex items-center justify-center px-4 py-12">
-            {/* Floating background elements */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-                <div className="absolute top-20 right-20 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float-slow"></div>
-                <div className="absolute bottom-20 left-20 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float-medium"></div>
-            </div>
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-void-base">
+            {/* Background Effects */}
+            <div className="absolute inset-0 bg-grid-pattern opacity-10" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="w-full max-w-md"
+                transition={{ duration: 0.8, type: "spring", stiffness: 50 }}
+                className="w-full max-w-[420px] z-10 p-1"
             >
-                <div className="glass rounded-2xl shadow-2xl p-8 relative z-10">
-                    {/* Back Button */}
-                    <button
-                        onClick={() => navigate('/signup')}
-                        className="absolute top-4 left-4 text-purple-600 hover:text-purple-700 transition-colors flex items-center gap-2"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-                        </svg>
-                        <span className="font-medium">Back</span>
-                    </button>
+                {/* Cyber Header */}
+                <div className="flex justify-between items-center text-xs font-mono text-white/20 mb-4 px-2 tracking-widest">
+                    <span>SECURE_LINK::ACTIVE</span>
+                    <span className="animate-pulse text-cyan-500">AWAITING_KEY</span>
+                </div>
 
-                    {/* Logo */}
-                    <div className="text-center mb-8">
-                        <motion.div
-                            initial={{ scale: 0, rotate: -180 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-                            className="mx-auto mb-6"
-                        >
-                            <img src={logo} alt="ArriBot Logo" className="w-48 h-48 mx-auto object-contain" />
-                        </motion.div>
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
-                            Verify Your Email
-                        </h1>
-                        <p className="text-gray-600 mt-2">
-                            We've sent a 4-digit code to<br />
-                            <span className="font-semibold text-purple-600">{email}</span>
+                {/* Glass Panel */}
+                <div className="bg-glass-base backdrop-blur-xl border border-white/10 rounded-3xl p-8 relative overflow-hidden">
+                    <div className="text-center mb-10">
+                        <div className="w-16 h-16 bg-white/5 rounded-2xl mx-auto flex items-center justify-center mb-4 border border-white/10 relative">
+                            <div className="absolute inset-0 bg-cyan-400/20 blur-xl animate-pulse-fast" />
+                            <ShieldCheck className="text-cyan-400 relative z-10" size={32} />
+                        </div>
+                        <h2 className="text-2xl font-display font-bold text-white mb-2">
+                            <ScrambleText text="SECURITY PROTOCOL" />
+                        </h2>
+                        <p className="text-white/40 text-xs font-mono">
+                            Enter the 6-digit key sent to <span className="text-white/70">{email.replace(/(.{2})(.*)(@.*)/, "$1***$3")}</span>
                         </p>
                     </div>
 
-                    {error && (
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-6 text-center"
-                        >
-                            {error}
-                        </motion.div>
-                    )}
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="flex justify-center space-x-4">
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        <div className="flex justify-between gap-2">
                             {otp.map((digit, index) => (
                                 <motion.input
                                     key={index}
-                                    id={`otp-${index}`}
+                                    ref={(el) => (inputRefs.current[index] = el)}
                                     type="text"
                                     maxLength={1}
                                     value={digit}
                                     onChange={(e) => handleChange(index, e.target.value)}
                                     onKeyDown={(e) => handleKeyDown(index, e)}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.1 }}
-                                    className="w-16 h-16 text-center text-2xl font-bold border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-300 outline-none bg-white"
+                                    onPaste={handlePaste}
+                                    className="w-12 h-16 text-center text-2xl font-mono font-bold bg-white/5 border border-white/10 rounded-lg text-white focus:border-cyan-400 focus:bg-cyan-900/10 focus:outline-none focus:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all caret-cyan-400"
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.2 + index * 0.05 }}
                                 />
                             ))}
                         </div>
 
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                            disabled={isLoading}
+                            className="w-full relative py-4 bg-cyan-500/10 border border-cyan-500/50 text-cyan-400 font-mono font-bold tracking-widest rounded-xl overflow-hidden group hover:bg-cyan-400 hover:text-black transition-all duration-300"
                         >
-                            {loading ? (
-                                <>
-                                    <div className="spinner"></div>
-                                    <span>Verifying...</span>
-                                </>
-                            ) : (
-                                <span>Verify & Continue</span>
-                            )}
+                            <span className="relative z-10 flex items-center justify-center gap-3">
+                                {isLoading ? <Loader2 className="animate-spin" /> : 'AUTHENTICATE'}
+                                {!isLoading && <Fingerprint size={20} className="group-hover:scale-110 transition-transform" />}
+                            </span>
                         </button>
                     </form>
 
-                    {/* Email Warnings */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="mt-6 bg-purple-50 border border-purple-200 rounded-lg p-4"
-                    >
-                        <div className="flex items-start space-x-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                            </svg>
-                            <div className="flex-1">
-                                <p className="text-sm font-semibold text-purple-900 mb-2">Can't find the email?</p>
-                                <ul className="text-sm text-purple-700 space-y-1">
-                                    <li className="flex items-start">
-                                        <span className="mr-2">•</span>
-                                        <span>Check your <strong>spam/junk folder</strong></span>
-                                    </li>
-                                    <li className="flex items-start">
-                                        <span className="mr-2">•</span>
-                                        <span>Email may take <strong>1-2 minutes</strong> to arrive</span>
-                                    </li>
-                                    <li className="flex items-start">
-                                        <span className="mr-2">•</span>
-                                        <span>Make sure you entered the correct email</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    <div className="mt-6 text-center">
-                        <p className="text-gray-600 mb-2">Didn't receive the code?</p>
-                        <button
-                            onClick={handleResend}
-                            disabled={resending}
-                            className="text-purple-600 font-semibold hover:text-purple-700 transition-colors disabled:opacity-50"
-                        >
-                            {resending ? 'Resending...' : 'Resend OTP'}
-                        </button>
+                    <div className="mt-8 text-center">
+                        <p className="text-xs text-white/30 font-mono">
+                            Session ID: <span className="text-white/50">{Math.random().toString(36).substr(2, 9).toUpperCase()}</span>
+                        </p>
                     </div>
                 </div>
             </motion.div>
         </div>
     );
-};
-
-export default VerifyOTP;
+}

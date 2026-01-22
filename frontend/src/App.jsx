@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
+import Auth from './pages/Auth';
 import SignUp from './pages/SignUp';
 import VerifyOTP from './pages/VerifyOTP';
 import SignIn from './pages/SignIn';
@@ -17,15 +18,20 @@ import Summarization from './pages/Summarization';
 
 function App() {
     return (
+
         <AuthProvider>
             <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
             <Layout>
                 <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={<Home />} />
-                    <Route path="/signup" element={<SignUp />} />
+                    <Route path="/auth" element={<Auth />} />
+
+                    {/* Redirect Legacy Routes */}
+                    <Route path="/signin" element={<Auth />} />
+                    <Route path="/signup" element={<Auth />} />
+
                     <Route path="/verify-otp" element={<VerifyOTP />} />
-                    <Route path="/signin" element={<SignIn />} />
                     <Route path="/contact" element={<ContactUs />} />
 
                     {/* Protected Routes */}
@@ -61,3 +67,4 @@ function App() {
 }
 
 export default App;
+
