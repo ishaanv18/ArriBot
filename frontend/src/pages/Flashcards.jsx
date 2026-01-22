@@ -17,15 +17,23 @@ const Flashcards = () => {
         if (!topic.trim() || isLoading) return;
 
         setIsLoading(true);
-        setFlashcards([]);
-        setFlippedCards(new Set());
+        setFlashcards([]); // Clear old flashcards
+        setFlippedCards(new Set()); // Reset flip state
 
         try {
             const response = await flashcardsAPI.generate(topic, count);
-            setFlashcards(response.data);
+            console.log('Flashcard API Response:', response.data);
+
+            // Ensure we only set the new flashcards (backend returns array directly)
+            if (Array.isArray(response.data)) {
+                setFlashcards(response.data);
+                console.log(`Loaded ${response.data.length} flashcards`);
+            } else {
+                console.error('Invalid response format:', response.data);
+            }
         } catch (error) {
             console.error('Error generating flashcards:', error);
-            // alert('Failed to generate flashcards. Please try again.'); 
+            setFlashcards([]); // Clear on error
         } finally {
             setIsLoading(false);
         }
