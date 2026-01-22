@@ -1,4 +1,4 @@
-import com.arribot.controller;
+package com.arribot.controller;
 
 import com.arribot.model.Resume;
 import com.arribot.model.SkillAnalysis;
