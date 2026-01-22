@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { authAPI } from '../utils/api';
 
 const AuthContext = createContext(null);
 
@@ -45,12 +46,26 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    const verifyOtp = async (email, otp) => {
+        const response = await authAPI.verifyOTP(email, otp);
+        // If backend returns token on verification, login the user
+        // Assuming response.data contains token/user like signin
+        // If not, we might need to adjust.
+        if (response.data.accessToken || response.data.token) {
+            const { accessToken, tokenType, ...userData } = response.data;
+            const token = accessToken || response.data.token;
+            login(token, userData);
+        }
+        return response.data;
+    };
+
     const value = {
         user,
         token,
         loading,
         login,
         logout,
+        verifyOtp,
         isAuthenticated: !!token,
     };
 

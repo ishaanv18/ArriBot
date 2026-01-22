@@ -52,11 +52,11 @@ public class AuthController {
             String email = request.get("email");
             String otp = request.get("otp");
 
-            String message = authService.verifyOTP(email, otp);
+            Map<String, Object> serviceResponse = authService.verifyOTP(email, otp);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("message", message);
+            response.putAll(serviceResponse); // merges message, token, user
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {

@@ -63,7 +63,7 @@ public class AuthService {
         }
     }
 
-    public String verifyOTP(String email, String otp) {
+    public java.util.Map<String, Object> verifyOTP(String email, String otp) {
         Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isEmpty()) {
@@ -95,7 +95,18 @@ public class AuthService {
             System.err.println("Failed to send welcome email: " + e.getMessage());
         }
 
-        return "Email verified successfully";
+        // Generate Token for auto-login
+        String token = jwtUtil.generateToken(email, user.getFullName());
+
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("message", "Email verified successfully");
+        response.put("token", token);
+        response.put("user", java.util.Map.of(
+                "email", user.getEmail(),
+                "fullName", user.getFullName()
+        ));
+
+        return response;
     }
 
     public String signin(String email, String password) {
