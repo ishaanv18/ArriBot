@@ -1,7 +1,50 @@
 
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { ScrambleText } from '../components/ui/ScrambleText';
+import { TiltCard } from '../components/ui/TiltCard';
+import { MessageSquare, BookOpen, BrainCircuit, FileText, Activity, Zap, Clock, Shield } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { aiUsageAPI } from '../utils/api';
 
-// ... existing imports
+const Widget = ({ title, icon: Icon, delay, onClick, color = "cyan" }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay, duration: 0.5 }}
+        onClick={onClick}
+        className={`group relative overflow-hidden rounded-3xl bg-glass-base border border-white/5 p-6 hover:bg-white/10 hover:border-${color}-400/30 transition-all cursor-pointer h-full`}
+    >
+        <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-${color}-400`}>
+            <Icon size={80} />
+        </div>
+
+        <div className="relative z-10 flex flex-col justify-between h-full">
+            <div className={`w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-4 text-${color}-400 group-hover:scale-110 transition-transform`}>
+                <Icon size={24} />
+            </div>
+
+            <div>
+                <h3 className="text-lg font-display font-medium mb-1">{title}</h3>
+                <p className="text-white/40 text-xs font-mono group-hover:text-white/60 transition-colors">
+                    Initialize Module &gt;&gt;
+                </p>
+            </div>
+        </div>
+    </motion.div>
+);
+
+const StatCard = ({ label, value, trend }) => (
+    <div className="bg-white/5 rounded-2xl p-4 border border-white/5 flex flex-col">
+        <span className="text-white/40 text-xs font-mono uppercase tracking-wider mb-1">{label}</span>
+        <div className="flex items-end gap-2">
+            <span className="text-2xl font-display font-medium">{value}</span>
+            {trend && <span className="text-cyan-400 text-xs mb-1">{trend}</span>}
+        </div>
+    </div>
+);
 
 const LimitBar = ({ label, current, max, color }) => {
     const percentage = Math.min((current / max) * 100, 100);
