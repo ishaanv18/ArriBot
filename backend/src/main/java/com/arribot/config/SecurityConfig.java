@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/flashcards/**").permitAll()
                         .requestMatchers("/api/quiz/**").permitAll()
                         .requestMatchers("/api/summarize/**").permitAll()
+                        .requestMatchers("/api/resume/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
