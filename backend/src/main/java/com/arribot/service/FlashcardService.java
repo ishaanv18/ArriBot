@@ -1,5 +1,6 @@
 package com.arribot.service;
 
+import com.arribot.model.AIFeature;
 import com.arribot.model.Flashcard;
 import com.arribot.repository.FlashcardRepository;
 import com.google.gson.Gson;
@@ -21,15 +22,21 @@ public class FlashcardService {
     private final GroqService groqService;
     private final FlashcardRepository flashcardRepository;
     private final Gson gson;
+    private final AILimitsService aiLimitsService;
 
-    public FlashcardService(GeminiService geminiService, GroqService groqService, FlashcardRepository flashcardRepository) {
+    public FlashcardService(GeminiService geminiService, GroqService groqService, 
+                           FlashcardRepository flashcardRepository, AILimitsService aiLimitsService) {
         this.geminiService = geminiService;
         this.groqService = groqService;
         this.flashcardRepository = flashcardRepository;
         this.gson = new Gson();
+        this.aiLimitsService = aiLimitsService;
     }
 
-    public List<Flashcard> generateFlashcards(String topic, int count) throws IOException {
+    public List<Flashcard> generateFlashcards(String topic, int count, String userId) throws IOException {
+        // Check AI limits before generation
+        aiLimitsService.checkAndIncrementUsage(userId, AIFeature.FLASHCARDS);
+        
         String response;
         try {
             // Use Groq as primary

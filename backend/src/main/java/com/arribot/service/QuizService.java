@@ -1,6 +1,7 @@
 package com.arribot.service;
 
-import com.arribot.model.Quiz;
+import com.arribot.model.AIFeature;
+ import com.arribot.model.Quiz;
 import com.arribot.repository.QuizRepository;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -21,15 +22,21 @@ public class QuizService {
     private final GroqService groqService;
     private final QuizRepository quizRepository;
     private final Gson gson;
+    private final AILimitsService aiLimitsService;
 
-    public QuizService(GeminiService geminiService, GroqService groqService, QuizRepository quizRepository) {
+    public QuizService(GeminiService geminiService, GroqService groqService, 
+                      QuizRepository quizRepository, AILimitsService aiLimitsService) {
         this.geminiService = geminiService;
         this.groqService = groqService;
         this.quizRepository = quizRepository;
         this.gson = new Gson();
+        this.aiLimitsService = aiLimitsService;
     }
 
-    public Quiz generateQuiz(String topic, int questionCount) throws IOException {
+    public Quiz generateQuiz(String topic, int questionCount, String userId) throws IOException {
+        // Check AI limits before generation
+        aiLimitsService.checkAndIncrementUsage(userId, AIFeature.QUIZ);
+        
         String response;
         try {
             // Use Groq as primary

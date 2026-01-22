@@ -24,12 +24,17 @@ public class FlashcardController {
         try {
             String topic = (String) request.get("topic");
             Integer count = request.get("count") != null ? ((Number) request.get("count")).intValue() : 5;
+            String userId = (String) request.get("userId"); // TODO: Extract from JWT token in production
 
             if (topic == null || topic.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Topic cannot be empty"));
             }
 
-            List<Flashcard> flashcards = flashcardService.generateFlashcards(topic, count);
+            if (userId == null || userId.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "User ID is required"));
+            }
+
+            List<Flashcard> flashcards = flashcardService.generateFlashcards(topic, count, userId);
             return ResponseEntity.ok(flashcards);
         } catch (Exception e) {
             return ResponseEntity.internalServerError()

@@ -24,12 +24,17 @@ public class ChatController {
         try {
             String message = request.get("message");
             String sessionId = request.get("sessionId");
+            String userId = request.get("userId"); // TODO: Extract from JWT token in production
 
             if (message == null || message.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Message cannot be empty"));
             }
 
-            ChatMessage chatMessage = chatService.sendMessage(message, sessionId);
+            if (userId == null || userId.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "User ID is required"));
+            }
+
+            ChatMessage chatMessage = chatService.sendMessage(message, sessionId, userId);
             return ResponseEntity.ok(chatMessage);
         } catch (Exception e) {
             return ResponseEntity.internalServerError()

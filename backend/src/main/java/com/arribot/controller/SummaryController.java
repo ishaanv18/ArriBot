@@ -23,12 +23,17 @@ public class SummaryController {
     public ResponseEntity<?> summarizeText(@RequestBody Map<String, String> request) {
         try {
             String text = request.get("text");
+            String userId = request.get("userId"); // TODO: Extract from JWT token in production
 
             if (text == null || text.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Text cannot be empty"));
             }
 
-            Summary summary = summaryService.summarizeText(text);
+            if (userId == null || userId.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "User ID is required"));
+            }
+
+            Summary summary = summaryService.summarizeText(text, userId);
             return ResponseEntity.ok(summary);
         } catch (Exception e) {
             return ResponseEntity.internalServerError()

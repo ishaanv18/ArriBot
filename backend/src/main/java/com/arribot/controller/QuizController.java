@@ -26,12 +26,17 @@ public class QuizController {
             Integer questionCount = request.get("questionCount") != null
                     ? ((Number) request.get("questionCount")).intValue()
                     : 5;
+            String userId = (String) request.get("userId"); // TODO: Extract from JWT token in production
 
             if (topic == null || topic.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Topic cannot be empty"));
             }
 
-            Quiz quiz = quizService.generateQuiz(topic, questionCount);
+            if (userId == null || userId.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "User ID is required"));
+            }
+
+            Quiz quiz = quizService.generateQuiz(topic, questionCount, userId);
             return ResponseEntity.ok(quiz);
         } catch (Exception e) {
             return ResponseEntity.internalServerError()

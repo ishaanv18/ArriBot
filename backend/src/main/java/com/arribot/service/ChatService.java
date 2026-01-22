@@ -1,5 +1,6 @@
 package com.arribot.service;
 
+import com.arribot.model.AIFeature;
 import com.arribot.model.ChatMessage;
 import com.arribot.repository.ChatMessageRepository;
 import org.slf4j.Logger;
@@ -17,14 +18,20 @@ public class ChatService {
     private final GeminiService geminiService;
     private final GroqService groqService;
     private final ChatMessageRepository chatMessageRepository;
+    private final AILimitsService aiLimitsService;
 
-    public ChatService(GeminiService geminiService, GroqService groqService, ChatMessageRepository chatMessageRepository) {
+    public ChatService(GeminiService geminiService, GroqService groqService, 
+                      ChatMessageRepository chatMessageRepository, AILimitsService aiLimitsService) {
         this.geminiService = geminiService;
         this.groqService = groqService;
         this.chatMessageRepository = chatMessageRepository;
+        this.aiLimitsService = aiLimitsService;
     }
 
-    public ChatMessage sendMessage(String message, String sessionId) throws IOException {
+    public ChatMessage sendMessage(String message, String sessionId, String userId) throws IOException {
+        // 1. Check AI limits BEFORE calling API
+        aiLimitsService.checkAndIncrementUsage(userId, AIFeature.CHAT);
+        
         if (sessionId == null || sessionId.isEmpty()) {
             sessionId = UUID.randomUUID().toString();
         }

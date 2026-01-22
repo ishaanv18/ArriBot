@@ -1,5 +1,6 @@
 package com.arribot.service;
 
+import com.arribot.model.AIFeature;
 import com.arribot.model.Summary;
 import com.arribot.repository.SummaryRepository;
 import org.slf4j.Logger;
@@ -16,14 +17,20 @@ public class SummaryService {
     private final GeminiService geminiService;
     private final GroqService groqService;
     private final SummaryRepository summaryRepository;
+    private final AILimitsService aiLimitsService;
 
-    public SummaryService(GeminiService geminiService, GroqService groqService, SummaryRepository summaryRepository) {
+    public SummaryService(GeminiService geminiService, GroqService groqService, 
+                         SummaryRepository summaryRepository, AILimitsService aiLimitsService) {
         this.geminiService = geminiService;
         this.groqService = groqService;
         this.summaryRepository = summaryRepository;
+        this.aiLimitsService = aiLimitsService;
     }
 
-    public Summary summarizeText(String text) throws IOException {
+    public Summary summarizeText(String text, String userId) throws IOException {
+        // Check AI limits before summarization
+        aiLimitsService.checkAndIncrementUsage(userId, AIFeature.SUMMARY);
+        
         String summarizedText;
         try {
             // Use Groq as primary
