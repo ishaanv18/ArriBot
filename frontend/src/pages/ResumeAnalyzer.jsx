@@ -17,11 +17,30 @@ export default function ResumeAnalyzer() {
     const [analysisResult, setAnalysisResult] = useState(null);
     const [targetRole, setTargetRole] = useState('Software Engineer');
     const [showRoleInput, setShowRoleInput] = useState(false);
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
 
     // Fetch resumes on mount
     useEffect(() => {
         fetchResumes();
     }, []);
+
+    const confirmDelete = async () => {
+        if (!deleteConfirm) return;
+
+        try {
+            await resumeService.deleteResume(deleteConfirm.id);
+            toast.success("Record Purged");
+            setResumes(prev => prev.filter(r => r.id !== deleteConfirm.id));
+            if (selectedResume?.id === deleteConfirm.id) {
+                setSelectedResume(null);
+                setAnalysisResult(null);
+            }
+        } catch (error) {
+            toast.error("Purge Failed");
+        } finally {
+            setDeleteConfirm(null);
+        }
+    };
 
     const fetchResumes = async () => {
         try {
@@ -64,21 +83,9 @@ export default function ResumeAnalyzer() {
         }
     };
 
-    const handleDelete = async (id, e) => {
+    const handleDelete = async (resume, e) => {
         e.stopPropagation();
-        if (!window.confirm("Purge this data record?")) return;
-
-        try {
-            await resumeService.deleteResume(id);
-            toast.success("Record Purged");
-            setResumes(prev => prev.filter(r => r.id !== id));
-            if (selectedResume?.id === id) {
-                setSelectedResume(null);
-                setAnalysisResult(null);
-            }
-        } catch (error) {
-            toast.error("Purge Failed");
-        }
+        setDeleteConfirm(resume);
     };
 
     const handleAnalyze = async (resume) => {
@@ -149,6 +156,57 @@ export default function ResumeAnalyzer() {
     return (
         <div className="min-h-screen bg-void-base text-white p-6 pb-24 md:p-12">
 
+            {/* Delete Confirmation Modal */}
+            <AnimatePresence>
+                {deleteConfirm && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                            onClick={() => setDeleteConfirm(null)}
+                        />
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="relative w-full max-w-md bg-zinc-900 border border-red-500/30 rounded-2xl p-6 shadow-2xl overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500" />
+                            <div className="absolute -right-10 -top-10 w-32 h-32 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                            <div className="flex flex-col items-center text-center gap-4 relative z-10">
+                                <div className="p-4 rounded-full bg-red-500/10 text-red-500 mb-2">
+                                    <Trash2 size={32} />
+                                </div>
+                                <h3 className="text-xl font-display font-bold text-white">Confirm Deletion</h3>
+                                <p className="text-white/60 text-sm max-w-xs">
+                                    Are you sure you want to purge <span className="text-white font-mono">{deleteConfirm.fileName}</span>? This action cannot be undone.
+                                </p>
+
+                                <div className="flex gap-3 w-full mt-4">
+                                    <button
+                                        onClick={() => setDeleteConfirm(null)}
+                                        className="flex-1 py-3 px-4 rounded-xl border border-white/10 hover:bg-white/5 text-white/60 hover:text-white transition-colors font-display text-sm"
+                                    >
+                                        CANCEL
+                                    </button>
+                                    <button
+                                        onClick={confirmDelete}
+                                        className="flex-1 py-3 px-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all font-display text-sm font-bold flex items-center justify-center gap-2 group"
+                                    >
+                                        <Trash2 size={16} />
+                                        PURGE DATA
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
             {/* Header */}
             <header className="mb-12">
                 <div className="flex items-center gap-2 mb-2">
@@ -217,7 +275,7 @@ export default function ResumeAnalyzer() {
                                             </div>
                                         </div>
                                         <button
-                                            onClick={(e) => handleDelete(resume.id, e)}
+                                            onClick={(e) => handleDelete(resume, e)}
                                             className="p-2 hover:bg-red-500/20 hover:text-red-400 rounded-lg text-white/20 transition-colors"
                                         >
                                             <Trash2 size={16} />
