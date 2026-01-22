@@ -68,7 +68,8 @@ export default function VerifyOTP() {
         setIsLoading(true);
         try {
             await verifyOtp(email, otpCode);
-            toast.success('Identity Verified', { icon: '🔓' });
+            toast.success('Verified Successfully', { icon: '✅' });
+            toast.success('Login Successfully', { icon: '🚀' });
             navigate('/dashboard');
         } catch (error) {
             console.error('Verification failed', error);

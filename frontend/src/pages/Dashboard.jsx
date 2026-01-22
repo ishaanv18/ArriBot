@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { ScrambleText } from '../components/ui/ScrambleText';
 import { TiltCard } from '../components/ui/TiltCard';
 import { MessageSquare, BookOpen, BrainCircuit, FileText, Activity, Zap, Clock, Shield } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Widget = ({ title, icon: Icon, delay, onClick, color = "cyan" }) => (
     <motion.div
@@ -56,6 +57,7 @@ export default function Dashboard() {
 
     const handleLogout = () => {
         logout();
+        toast.success("Logout Successfully", { icon: '👋' });
         navigate('/auth');
     };
 
