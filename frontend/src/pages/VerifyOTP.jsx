@@ -1,18 +1,19 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { ShieldCheck, Loader2, Fingerprint } from 'lucide-react';
+import { ShieldCheck, Loader2, Fingerprint, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ScrambleText } from '../components/ui/ScrambleText';
 
 export default function VerifyOTP() {
-    const [otp, setOtp] = useState(['', '', '', '', '', '']);
+    const [otp, setOtp] = useState(['', '', '', '']);
     const [isLoading, setIsLoading] = useState(false);
     const inputRefs = useRef([]);
     const location = useLocation();
     const navigate = useNavigate();
-    const { verifyOtp } = useAuth(); // Ensure this exists in your AuthContext
+    const { verifyOtp } = useAuth();
 
     const email = location.state?.email || '';
 
@@ -24,15 +25,15 @@ export default function VerifyOTP() {
     }, [email, navigate]);
 
     const handleChange = (index, value) => {
-        if (value.length > 1) return; // Prevent multiple chars
-        if (isNaN(value)) return; // Only numbers
+        if (value.length > 1) return;
+        if (isNaN(value)) return;
 
         const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
 
         // Auto-focus next input
-        if (value && index < 5) {
+        if (value && index < 3) {
             inputRefs.current[index + 1].focus();
         }
     };
@@ -45,21 +46,21 @@ export default function VerifyOTP() {
 
     const handlePaste = (e) => {
         e.preventDefault();
-        const pastedData = e.clipboardData.getData('text').slice(0, 6);
+        const pastedData = e.clipboardData.getData('text').slice(0, 4);
         if (!/^\d+$/.test(pastedData)) return;
 
         const newOtp = [...otp];
         pastedData.split('').forEach((char, i) => {
-            if (i < 6) newOtp[i] = char;
+            if (i < 4) newOtp[i] = char;
         });
         setOtp(newOtp);
-        inputRefs.current[Math.min(pastedData.length, 5)].focus();
+        inputRefs.current[Math.min(pastedData.length, 3)].focus();
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const otpCode = otp.join('');
-        if (otpCode.length < 6) {
+        if (otpCode.length < 4) {
             toast.error('Incomplete Sequence');
             return;
         }
@@ -73,7 +74,7 @@ export default function VerifyOTP() {
             console.error('Verification failed', error);
             const message = error.response?.data?.message || 'Protocol Mismatch';
             toast.error(message);
-            setOtp(['', '', '', '', '', '']);
+            setOtp(['', '', '', '']);
             inputRefs.current[0].focus();
         } finally {
             setIsLoading(false);
@@ -100,7 +101,7 @@ export default function VerifyOTP() {
 
                 {/* Glass Panel */}
                 <div className="bg-glass-base backdrop-blur-xl border border-white/10 rounded-3xl p-8 relative overflow-hidden">
-                    <div className="text-center mb-10">
+                    <div className="text-center mb-6">
                         <div className="w-16 h-16 bg-white/5 rounded-2xl mx-auto flex items-center justify-center mb-4 border border-white/10 relative">
                             <div className="absolute inset-0 bg-cyan-400/20 blur-xl animate-pulse-fast" />
                             <ShieldCheck className="text-cyan-400 relative z-10" size={32} />
@@ -109,12 +110,12 @@ export default function VerifyOTP() {
                             <ScrambleText text="SECURITY PROTOCOL" />
                         </h2>
                         <p className="text-white/40 text-xs font-mono">
-                            Enter the 6-digit key sent to <span className="text-white/70">{email.replace(/(.{2})(.*)(@.*)/, "$1***$3")}</span>
+                            Enter the 4-digit key sent to <span className="text-white/70">{email.replace(/(.{2})(.*)(@.*)/, "$1***$3")}</span>
                         </p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-8">
-                        <div className="flex justify-between gap-2">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="flex justify-between gap-3 px-4">
                             {otp.map((digit, index) => (
                                 <motion.input
                                     key={index}
@@ -125,12 +126,20 @@ export default function VerifyOTP() {
                                     onChange={(e) => handleChange(index, e.target.value)}
                                     onKeyDown={(e) => handleKeyDown(index, e)}
                                     onPaste={handlePaste}
-                                    className="w-12 h-16 text-center text-2xl font-mono font-bold bg-white/5 border border-white/10 rounded-lg text-white focus:border-cyan-400 focus:bg-cyan-900/10 focus:outline-none focus:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all caret-cyan-400"
+                                    className="w-14 h-16 text-center text-2xl font-mono font-bold bg-white/5 border border-white/10 rounded-xl text-white focus:border-cyan-400 focus:bg-cyan-900/10 focus:outline-none focus:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all caret-cyan-400"
                                     initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.2 + index * 0.05 }}
                                 />
                             ))}
+                        </div>
+
+                        {/* Spam Warning Alert */}
+                        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3 flex items-start gap-3">
+                            <AlertCircle className="text-yellow-500 shrink-0 mt-0.5" size={16} />
+                            <p className="text-xs text-yellow-200/80 leading-relaxed font-mono">
+                                Kindly check spam folder of your mail for the otp its important.
+                            </p>
                         </div>
 
                         <button
