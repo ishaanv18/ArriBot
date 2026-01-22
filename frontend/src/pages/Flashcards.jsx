@@ -112,17 +112,24 @@ const Flashcards = () => {
                 {flashcards.length > 0 && (
                     <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {flashcards.map((card, index) => (
-                            <div key={index} className="perspective-1000 h-[300px]">
+                            <div key={index} className="h-[300px]" style={{ perspective: '1000px' }}>
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: index * 0.1 }}
-                                    className="relative w-full h-full transition-transform duration-700 transform-style-3d cursor-pointer"
-                                    style={{ transform: flippedCards.has(index) ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
+                                    className="relative w-full h-full cursor-pointer"
+                                    style={{
+                                        transformStyle: 'preserve-3d',
+                                        transform: flippedCards.has(index) ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                                        transition: 'transform 0.6s'
+                                    }}
                                     onClick={() => toggleFlip(index)}
                                 >
                                     {/* Front */}
-                                    <TiltCard className="absolute inset-0 w-full h-full bg-glass-base backdrop-blur-xl border border-white/10 rounded-3xl p-8 backface-hidden flex flex-col justify-between group hover:border-violet-500/30">
+                                    <TiltCard
+                                        className="absolute inset-0 w-full h-full bg-glass-base backdrop-blur-xl border border-white/10 rounded-3xl p-8 flex flex-col justify-between group hover:border-violet-500/30"
+                                        style={{ backfaceVisibility: 'hidden' }}
+                                    >
                                         <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
 
                                         <div className="flex justify-between items-start">
@@ -140,7 +147,13 @@ const Flashcards = () => {
                                     </TiltCard>
 
                                     {/* Back */}
-                                    <TiltCard className="absolute inset-0 w-full h-full bg-violet-950/40 backdrop-blur-xl border border-violet-500/30 rounded-3xl p-8 backface-hidden transform-rotate-y-180 flex flex-col justify-between">
+                                    <TiltCard
+                                        className="absolute inset-0 w-full h-full bg-violet-950/40 backdrop-blur-xl border border-violet-500/30 rounded-3xl p-8 flex flex-col justify-between"
+                                        style={{
+                                            backfaceVisibility: 'hidden',
+                                            transform: 'rotateY(180deg)'
+                                        }}
+                                    >
                                         <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
 
                                         <div className="flex justify-between items-start">
