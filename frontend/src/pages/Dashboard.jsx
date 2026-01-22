@@ -7,6 +7,7 @@ import { ScrambleText } from '../components/ui/ScrambleText';
 import { TiltCard } from '../components/ui/TiltCard';
 import { MessageSquare, BookOpen, BrainCircuit, FileText, Activity, Zap, Clock, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { aiUsageAPI } from '../utils/api';
 
 const Widget = ({ title, icon: Icon, delay, onClick, color = "cyan" }) => (
     <motion.div
@@ -45,15 +46,43 @@ const StatCard = ({ label, value, trend }) => (
     </div>
 );
 
+const LimitBar = ({ label, current, max, color }) => {
+    const percentage = Math.min((current / max) * 100, 100);
+    return (
+        <div>
+            <div className="flex justify-between text-xs mb-1">
+                <span className="text-white/60">{label}</span>
+                <span className={`text-${color}-400`}>{current}/{max}</span>
+            </div>
+            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div
+                    className={`h-full bg-${color}-400 transition-all duration-1000`}
+                    style={{ width: `${percentage}%` }}
+                />
+            </div>
+        </div>
+    );
+};
+
 export default function Dashboard() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [time, setTime] = useState(new Date());
+    const [usageStats, setUsageStats] = useState(null);
 
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000);
+
+        // Fetch AI Usage Stats
+        if (user) {
+            const userId = user.id || user._id;
+            aiUsageAPI.getStats(userId)
+                .then(res => setUsageStats(res.data))
+                .catch(err => console.error("Failed to load usage stats", err));
+        }
+
         return () => clearInterval(timer);
-    }, []);
+    }, [user]);
 
     const handleLogout = () => {
         logout();
@@ -105,8 +134,23 @@ export default function Dashboard() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <StatCard label="Daily Streak" value="1 Days" trend="🔥" />
                         <StatCard label="Knowledge Pts" value="150" trend="+10" />
-                        <StatCard label="Cards Mastered" value="0" />
                         <StatCard label="System Level" value="v.1.0" />
+                        <StatCard
+                            label="Total Requests"
+                            value={usageStats?.totalRequestsToday || 0}
+                            trend="Today"
+                        />
+                    </div>
+
+                    {/* AI Resource Limits Section */}
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                        <h2 className="text-sm font-mono text-white/40 uppercase tracking-widest mb-4">Daily Resource Limits</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <LimitBar label="Neural Chat" current={30 - (usageStats?.chatRemaining || 30)} max={30} color="cyan" />
+                            <LimitBar label="Flash Recall" current={10 - (usageStats?.flashcardsRemaining || 10)} max={10} color="violet" />
+                            <LimitBar label="Cog Quiz" current={5 - (usageStats?.quizRemaining || 5)} max={5} color="pink" />
+                            <LimitBar label="Summarizer" current={10 - (usageStats?.summaryRemaining || 10)} max={10} color="emerald" />
+                        </div>
                     </div>
 
                     {/* Modules Grid */}
