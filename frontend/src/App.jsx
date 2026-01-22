@@ -14,7 +14,7 @@ import Dashboard from './pages/Dashboard';
 import ChatBot from './pages/ChatBot';
 import Flashcards from './pages/Flashcards';
 import QuizGenerator from './pages/QuizGenerator';
-import Summarization from './pages/Summarization';
+import ResumeAnalyzer from './pages/ResumeAnalyzer';
 
 function App() {
     return (
@@ -58,6 +58,11 @@ function App() {
                     <Route path="/summarize" element={
                         <ProtectedRoute>
                             <Summarization />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/resume" element={
+                        <ProtectedRoute>
+                            <ResumeAnalyzer />
                         </ProtectedRoute>
                     } />
                 </Routes>
