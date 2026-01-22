@@ -18,7 +18,10 @@ public class Resume {
     private String fileName;
     private String filePath;
     private LocalDateTime uploadedAt;
+
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private String extractedText;
+
     private String analysisResult;
 
     // Constructors

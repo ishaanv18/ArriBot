@@ -23,6 +23,7 @@ public class User {
     @Indexed(unique = true)
     private String email;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private String password; // Hashed password
 
     private boolean isVerified = false;
