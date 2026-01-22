@@ -61,7 +61,7 @@ const ChatBot = () => {
             </div>
 
             {/* Chat Interface */}
-            <div className="w-full max-w-4xl flex-1 flex flex-col bg-glass-base backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden relative h-[70vh]">
+            <div className="w-full max-w-4xl flex-1 flex flex-col bg-glass-base backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden relative h-[70vh] mb-24">
                 {/* Grid Overlay */}
                 <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
 
