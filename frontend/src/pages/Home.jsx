@@ -118,9 +118,9 @@ export default function Home() {
                                 </div>
 
                                 <div className="space-y-2 font-mono text-xs text-cyan-300">
-                                    <p>&gt; Initializing AI Modules...</p>
-                                    <p>&gt; Loading Career Engine...</p>
-                                    <p>&gt; System Ready.</p>
+                                    <p>&gt; <ScrambleText text="Initializing AI Modules..." /></p>
+                                    <p>&gt; <ScrambleText text="Loading Career Engine..." /></p>
+                                    <p>&gt; <ScrambleText text="System Ready." /></p>
                                 </div>
                             </div>
                         </TiltCard>
@@ -198,16 +198,16 @@ export default function Home() {
                         </p>
 
                         <ul className="space-y-3 font-mono text-sm text-emerald-300">
-                            <li>• Skill Gap Detection</li>
-                            <li>• Role-Based Readiness Score</li>
-                            <li>• AI Learning Recommendations</li>
-                            <li>• Placement-Oriented Insights</li>
+                            <li>• <ScrambleText text="Skill Gap Detection" /></li>
+                            <li>• <ScrambleText text="Role-Based Readiness Score" /></li>
+                            <li>• <ScrambleText text="AI Learning Recommendations" /></li>
+                            <li>• <ScrambleText text="Placement-Oriented Insights" /></li>
                         </ul>
                     </div>
 
                     <div className="bg-black/40 rounded-xl border border-white/10 flex items-center justify-center p-6">
                         <span className="font-mono text-white/30">
-                            [ RESUME → SKILL MAP → LEARNING PATH ]
+                            [ <ScrambleText text="RESUME → SKILL MAP → LEARNING PATH" /> ]
                         </span>
                     </div>
                 </div>
@@ -279,19 +279,22 @@ export default function Home() {
                     Learn smarter. Prepare faster. Build your career with AI.
                 </p>
 
-                <GlassPillButton onClick={() => navigate('/auth')}>
-                    START LEARNING NOW
+                <GlassPillButton onClick={() => navigate('/auth')} className="px-8 py-4 text-lg group">
+                    <span className="flex items-center gap-3">
+                        <Zap size={20} className="group-hover:text-yellow-400 transition-colors" />
+                        <ScrambleText text="START LEARNING NOW" />
+                    </span>
                 </GlassPillButton>
             </section>
 
             {/* ================= FOOTER ================= */}
             <footer className="py-12 border-t border-white/5 text-center text-white/30 text-sm font-mono">
-                <p className="mb-2">
-                    Built with ❤️ using Spring Boot · React · MongoDB · Groq AI
-                </p>
-                <p>
-                    Designed with responsible AI usage and scalable architecture.
-                </p>
+                <div className="mb-2">
+                    <ScrambleText text="Built by Ishaan Verma with ❤️ using Spring Boot · React · MongoDB · Groq AI" />
+                </div>
+                <div>
+                    <ScrambleText text="Designed with responsible AI usage and scalable architecture." />
+                </div>
             </footer>
 
         </div>
