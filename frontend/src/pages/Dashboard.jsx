@@ -140,6 +140,13 @@ export default function Dashboard() {
                             onClick={() => navigate('/summarize')}
                             color="emerald"
                         />
+                        <Widget
+                            title="Resume Analyzer"
+                            icon={FileText}
+                            delay={0.5}
+                            onClick={() => navigate('/resume')}
+                            color="rose"
+                        />
                     </div>
                 </div>
 
