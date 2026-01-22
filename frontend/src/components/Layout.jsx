@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { useAutoLogout } from '../hooks/useAutoLogout';
 import { FloatingDock } from './ui/FloatingDock';
 import { SpotlightCursor } from './ui/SpotlightCursor';
 import { Home, LayoutDashboard, MessageSquare, BookOpen, BrainCircuit, FileText, Mail, LogIn, User, Briefcase } from 'lucide-react';
@@ -9,6 +10,9 @@ import { Home, LayoutDashboard, MessageSquare, BookOpen, BrainCircuit, FileText,
 const Layout = ({ children }) => {
     const location = useLocation();
     const { isAuthenticated, user } = useAuth();
+
+    // Enable auto-logout for authenticated users (5 minutes inactivity)
+    useAutoLogout(5 * 60 * 1000);
 
     // Define Navigation Items for the Floating Dock
     const navItems = [
