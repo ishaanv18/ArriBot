@@ -1,0 +1,80 @@
+package com.arribot.service;
+
+import com.arribot.model.AIFeature;
+import com.arribot.model.Flashcard;
+import com.arribot.model.GroqResponse;
+import com.arribot.repository.FlashcardRepository;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class FlashcardService {
+
+    private static final Logger logger = LoggerFactory.getLogger(FlashcardService.class);
+    private final GroqService groqService;
+    private final FlashcardRepository flashcardRepository;
+    private final Gson gson;
+    private final AILimitsService aiLimitsService;
+
+    public FlashcardService(GroqService groqService,
+                            FlashcardRepository flashcardRepository,
+                            AILimitsService aiLimitsService) {
+        this.groqService = groqService;
+        this.flashcardRepository = flashcardRepository;
+        this.gson = new Gson();
+        this.aiLimitsService = aiLimitsService;
+    }
+
+    public List<Flashcard> generateFlashcards(String topic, int count, String userId) throws IOException {
+        aiLimitsService.checkAndIncrementUsage(userId, AIFeature.FLASHCARDS);
+
+        GroqResponse groqResponse = groqService.generateFlashcards(topic, count);
+        aiLimitsService.recordTokenUsage(userId, groqResponse);
+        logger.info("Flashcards generated using Groq");
+
+        List<Flashcard> flashcards = new ArrayList<>();
+        try {
+            String jsonString = extractJson(groqResponse.getText());
+            JsonArray jsonArray = gson.fromJson(jsonString, JsonArray.class);
+
+            int itemsToProcess = Math.min(jsonArray.size(), count);
+            logger.info("Processing {} flashcards (requested: {}, received: {})", itemsToProcess, count, jsonArray.size());
+
+            for (int i = 0; i < itemsToProcess; i++) {
+                JsonObject obj = jsonArray.get(i).getAsJsonObject();
+                String question = obj.get("question").getAsString();
+                String answer = obj.get("answer").getAsString();
+                flashcards.add(flashcardRepository.save(new Flashcard(topic, question, answer)));
+            }
+        } catch (Exception e) {
+            logger.error("Error parsing flashcards from AI response", e);
+            throw new IOException("Failed to parse flashcards: " + e.getMessage());
+        }
+
+        return flashcards;
+    }
+
+    public List<Flashcard> getFlashcardsByTopic(String topic) {
+        return flashcardRepository.findByTopicOrderByCreatedAtDesc(topic);
+    }
+
+    public List<Flashcard> getAllFlashcards() {
+        return flashcardRepository.findAll();
+    }
+
+    private String extractJson(String response) {
+        String cleaned = response.trim();
+        if (cleaned.startsWith("```json")) cleaned = cleaned.substring(7);
+        else if (cleaned.startsWith("```")) cleaned = cleaned.substring(3);
+        if (cleaned.endsWith("```")) cleaned = cleaned.substring(0, cleaned.length() - 3);
+        return cleaned.trim();
+    }
+}
