@@ -3,7 +3,7 @@
 <div align="center">
 
 <div align="center">
-  <img src="frontend/src/assets/arribot-logo-new.png" alt="ArriBot Logo" width="220"/>
+  <img src="frontend/src/assets/arribot-logo.png" alt="ArriBot Logo" width="220"/>
   
   <br/>
 
