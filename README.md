@@ -1,4 +1,4 @@
-# ArriBot — AI-Powered Holographic Learning Companion 🚀🧠
+# ArriBot — AI-Powered Holographic Learning Companion 
 
 <div align="center">
 
