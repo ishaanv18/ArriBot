@@ -795,7 +795,7 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 
 <div align="center">
 
-**Built with ❤️ by the ArriBot Team**
+**Built with ❤️ by the Ishaan Verma**
 
 *Transforming the way the world learns — one neural link at a time.*
 
