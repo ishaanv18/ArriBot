@@ -2,9 +2,10 @@
 
 <div align="center">
 
-![ArriBot Logo](./frontend/public/assets/arribot-logo-new.png)
-
-<br/>
+<div align="center">
+  <img src="frontend/src/assets/arribot-logo-new.png" alt="ArriBot Logo" width="220"/>
+  
+  <br/>
 
 **ArriBot** is a next-generation, AI-powered learning platform that combines a stunning holographic spatial UI with a robust Java Spring Boot backend and dual AI engines (Groq & Google Gemini). It delivers a fully immersive, personalized study environment — from adaptive chatting and smart flashcards to AI-generated quizzes, summarization, resume analysis, and structured learning path curricula.
 
