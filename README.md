@@ -25,24 +25,25 @@
 ## 📋 Table of Contents
 
 1. [Project Overview](#-project-overview)
-2. [Observations & Motivation](#-observations--motivation)
-3. [Problem Statement](#-problem-statement)
-4. [Solution](#-solution)
-5. [Features](#-features)
-6. [Feature Deep Dive](#-feature-deep-dive)
-7. [Project Workflow](#-project-workflow)
-8. [Architecture](#-architecture)
-9. [Tech Stack](#-tech-stack)
-10. [Data Models](#-data-models)
-11. [API Reference](#-api-reference)
-12. [Getting Started](#-getting-started)
-13. [Environment Variables](#-environment-variables)
-14. [Deployment](#-deployment)
-15. [AI Rate Limits & Usage Tracking](#-ai-rate-limits--usage-tracking)
-16. [Security](#-security)
-17. [Future Scope](#-future-scope)
-18. [Contributing](#-contributing)
-19. [License](#-license)
+2. [Product Requirements Document (PRD)](#-product-requirements-document-prd)
+3. [Observations & Motivation](#-observations--motivation)
+4. [Problem Statement](#-problem-statement)
+5. [Solution](#-solution)
+6. [Features](#-features)
+7. [Feature Deep Dive](#-feature-deep-dive)
+8. [Project Workflow](#-project-workflow)
+9. [Architecture](#-architecture)
+10. [Tech Stack](#-tech-stack)
+11. [Data Models](#-data-models)
+12. [API Reference](#-api-reference)
+13. [Getting Started](#-getting-started)
+14. [Environment Variables](#-environment-variables)
+15. [Deployment](#-deployment)
+16. [AI Rate Limits & Usage Tracking](#-ai-rate-limits--usage-tracking)
+17. [Security](#-security)
+18. [Future Scope](#-future-scope)
+19. [Contributing](#-contributing)
+20. [License](#-license)
 
 ---
 
@@ -62,6 +63,14 @@ The platform is not just a chatbot. It is a **complete intelligent study ecosyst
 | 🗺️ Learning Path | Multi-week, day-by-day AI-generated curricula |
 
 Every feature is gated behind a **JWT-secured authentication system** with OTP email verification, daily usage limits per feature, and real-time token consumption tracking.
+
+---
+
+## 📄 Product Requirements Document (PRD)
+
+For a complete and comprehensive overview of the product's vision, features, roadmap, and design strategy, please review our detailed Product Requirements Document (PRD):
+- [View the full PRD on Notion](https://www.notion.so/ArriBot-Product-Requirements-Document-35de0b2be0e1808b8031f9a0908add3e?source=copy_link)
+- Alternatively, you can view the local copy in [`PRODUCT_MANAGEMENT.md`](./PRODUCT_MANAGEMENT.md).
 
 ---
 
