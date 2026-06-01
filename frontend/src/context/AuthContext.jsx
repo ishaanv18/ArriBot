@@ -48,13 +48,10 @@ export const AuthProvider = ({ children }) => {
 
     const verifyOtp = async (email, otp) => {
         const response = await authAPI.verifyOTP(email, otp);
-        // If backend returns token on verification, login the user
-        // Assuming response.data contains token/user like signin
-        // If not, we might need to adjust.
-        if (response.data.accessToken || response.data.token) {
-            const { accessToken, tokenType, ...userData } = response.data;
-            const token = accessToken || response.data.token;
-            login(token, userData);
+        // Backend returns: { success, message, token, user: { email, fullName } }
+        const { token, user } = response.data;
+        if (token && user) {
+            login(token, user);
         }
         return response.data;
     };

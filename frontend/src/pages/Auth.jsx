@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 export default function Auth() {
     const [isSignUp, setIsSignUp] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const { login, signup } = useAuth();
+    const { login } = useAuth();
     const navigate = useNavigate();
 
     // Unified Form State
@@ -47,7 +47,9 @@ export default function Auth() {
         try {
             if (isSignUp) {
                 if (formData.password !== formData.confirmPassword) {
-                    throw new Error("Code Mismatch");
+                    toast.error("Passwords do not match", { icon: '🛑' });
+                    setIsLoading(false);
+                    return;
                 }
 
                 // Real API Call
@@ -59,14 +61,13 @@ export default function Auth() {
                 // Real API Call
                 const response = await authAPI.signin(formData.email, formData.password);
 
-                // Update Context with Token & User from response
-                // Response structure assumed to be { token: "...", type: "...", id: ..., username: "...", email: "...", roles: [...] } based on standard JWT responses
-                // Or standardized { status: "success", data: { token, user } }
+                // Backend returns: { success: true, token: "...", user: { email, fullName } }
+                if (!response.data.success) {
+                    throw new Error(response.data.message || "Sign in failed");
+                }
 
-                // Let's inspect typical response from backend (Spring Boot usually returns direct object)
-                // We'll trust the response contains 'token' and user details.
-                const token = response.data.token || response.data.accessToken;
-                const userData = response.data.user; // Extract actual user object
+                const token = response.data.token;
+                const userData = response.data.user;
 
                 if (!token) throw new Error("Security Token Missing");
 
@@ -77,7 +78,8 @@ export default function Auth() {
             }
         } catch (error) {
             console.error(error);
-            const msg = error.response?.data?.message || "Access Denied";
+            // Use backend message, or local error message, or generic fallback
+            const msg = error.response?.data?.message || error.message || "Access Denied";
 
             // Handle Unverified User Case
             if (msg.includes("Please verify your email first") || msg.toLowerCase().includes("verify")) {
